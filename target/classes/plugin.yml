@@ -1,0 +1,127 @@
+name: FotiaChat
+version: 1.0.1
+main: gg.fotia.chat.FotiaChat
+api-version: '1.20'
+author: Fotia
+description: 高级聊天管理插件
+
+softdepend:
+  - PlaceholderAPI
+  - CraftEngine
+  - Custom-Nameplates
+
+commands:
+  channel:
+    description: 切换聊天频道
+    usage: /channel [频道名]
+    aliases: [ch]
+    permission: fotiachat.command.channel
+  chatcolor:
+    description: 设置聊天颜色
+    usage: /chatcolor [颜色ID|list|reset]
+    aliases: [cc, color]
+    permission: fotiachat.color
+  msg:
+    description: 发送私聊消息
+    usage: /msg <玩家> <消息>
+    aliases: [tell, whisper, w, m]
+    permission: fotiachat.command.msg
+  reply:
+    description: 回复上一个私聊
+    usage: /reply <消息>
+    aliases: [r]
+    permission: fotiachat.command.reply
+  socialspy:
+    description: 切换私聊监听模式
+    usage: /socialspy
+    aliases: [spy]
+    permission: fotiachat.command.socialspy
+  mute:
+    description: 禁言玩家
+    usage: /mute <玩家> [时长] [原因]
+    permission: fotiachat.command.mute
+  unmute:
+    description: 解除玩家禁言
+    usage: /unmute <玩家>
+    permission: fotiachat.command.unmute
+  fotiachat:
+    description: FotiaChat主命令
+    usage: /fotiachat <reload|help|version>
+    aliases: [fc]
+    permission: fotiachat.admin
+  announcement:
+    description: 公告管理命令
+    usage: /announcement <send|broadcast|list|toggle|reload>
+    aliases: [announce, ann]
+    permission: fotiachat.command.announcement
+  shout:
+    description: BossBar全服喊话
+    usage: /shout <消息>
+    permission: fotiachat.premium.shout
+  chatbg:
+    description: 聊天背景选择
+    usage: /chatbg [背景ID]
+    aliases: [background, bg]
+    permission: fotiachat.premium.background
+
+permissions:
+  fotiachat.command.channel:
+    description: 允许使用频道命令
+    default: true
+  fotiachat.channel.admin:
+    description: 允许使用管理员频道
+    default: op
+  fotiachat.channel.help:
+    description: 允许使用求助频道
+    default: true
+  fotiachat.image:
+    description: 允许在聊天中使用图片
+    default: op
+  fotiachat.color:
+    description: 允许使用聊天颜色命令
+    default: true
+  fotiachat.color.*:
+    description: 允许使用所有聊天颜色
+    default: op
+  fotiachat.filter.bypass:
+    description: 绕过屏蔽词过滤
+    default: op
+  fotiachat.command.msg:
+    description: 允许使用私聊命令
+    default: true
+  fotiachat.command.reply:
+    description: 允许使用回复命令
+    default: true
+  fotiachat.command.socialspy:
+    description: 允许使用私聊监听命令
+    default: op
+  fotiachat.command.mute:
+    description: 允许使用禁言命令
+    default: op
+  fotiachat.command.unmute:
+    description: 允许使用解禁命令
+    default: op
+  fotiachat.mute.exempt:
+    description: 免疫禁言
+    default: op
+  fotiachat.admin:
+    description: 允许使用管理命令
+    default: op
+  fotiachat.admin.reload:
+    description: 允许重载配置
+    default: op
+  fotiachat.command.announcement:
+    description: 允许使用公告命令
+    default: op
+  fotiachat.premium.shout:
+    description: 允许使用BossBar喊话
+    default: op
+  fotiachat.premium.shout.bypass:
+    description: 绕过喊话冷却
+    default: op
+  fotiachat.premium.background:
+    description: 允许使用背景选择
+    default: true
+  fotiachat.premium.background.*:
+    description: 允许使用所有背景
+    default: op

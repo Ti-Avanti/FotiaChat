@@ -1,0 +1,54 @@
+# FotiaChat 屏蔽词配置文件
+# 敏感词过滤设置
+
+# 是否启用屏蔽词过滤
+enabled: true
+
+# 是否记录被阻止的消息到控制台
+log-blocked: true
+
+# 过滤规则列表
+# 每条规则包含以下配置:
+#   pattern: 匹配模式
+#   type: 匹配类型
+#     - EXACT: 精确匹配 (消息完全等于pattern)
+#     - CONTAINS: 包含匹配 (消息包含pattern)
+#     - REGEX: 正则匹配 (使用正则表达式)
+#   replace-mode: 替换方式
+#     - REPLACE_WORD: 只替换敏感词为replacement
+#     - REPLACE_MESSAGE: 替换整条消息为replacement
+#     - BLOCK: 阻止消息发送
+#   replacement: 替换文本 (BLOCK模式下无效)
+#   case-sensitive: 是否区分大小写 (默认false)
+rules:
+  # 示例规则 - 广告过滤
+  ad_filter:
+    pattern: "(qq|QQ|微信|wechat).*\\d{5,}"
+    type: REGEX
+    replace-mode: BLOCK
+    replacement: ""
+    case-sensitive: false
+
+  # 示例规则 - 网址过滤
+  url_filter:
+    pattern: "(https?://|www\\.)[^\\s]+"
+    type: REGEX
+    replace-mode: REPLACE_WORD
+    replacement: "[链接已屏蔽]"
+    case-sensitive: false
+
+  # 示例规则 - 脏话过滤 (示例，请根据需要自行添加)
+  # bad_word_example:
+  #   pattern: "脏话"
+  #   type: CONTAINS
+  #   replace-mode: REPLACE_WORD
+  #   replacement: "***"
+  #   case-sensitive: false
+
+  # 示例规则 - 刷屏检测 (重复字符)
+  spam_repeat:
+    pattern: "(.)\\1{9,}"
+    type: REGEX
+    replace-mode: REPLACE_WORD
+    replacement: "$1$1$1"
+    case-sensitive: false

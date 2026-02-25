@@ -1,0 +1,133 @@
+# FotiaChat 公告配置文件
+# 自动公告设置
+
+# 是否启用自动公告
+enabled: true
+
+# 是否随机播放消息 (false为顺序播放)
+random: false
+
+# 公告列表
+# 每条公告包含以下配置:
+#   enabled: 是否启用此公告
+#   permission: 接收公告所需权限 (留空表示所有人)
+#   interval: 播放间隔 (秒)
+#   messages: 消息列表 (支持MiniMessage格式)
+#   sound: 播放音效 (可选)
+#   sound-volume: 音效音量 (默认1.0)
+#   sound-pitch: 音效音调 (默认1.0)
+#   hover: 悬浮显示配置 (可选)
+#   click: 点击事件配置 (可选)
+announcements:
+  # 欢迎公告
+  welcome:
+    enabled: true
+    permission: ""
+    interval: 600
+    messages:
+      - "<!i><gradient:#FF6B6B:#4ECDC4>========================================</gradient>"
+      - "<!i><white>       欢迎来到服务器!</white>"
+      - "<!i><gray>       祝您游戏愉快~</gray>"
+      - "<!i><gradient:#FF6B6B:#4ECDC4>========================================</gradient>"
+    sound: "ENTITY_PLAYER_LEVELUP"
+    sound-volume: 0.5
+    sound-pitch: 1.0
+
+  # 规则提醒
+  rules:
+    enabled: true
+    permission: ""
+    interval: 900
+    messages:
+      - "<!i><yellow>[提示]</yellow> <gray>请遵守服务器规则，文明游戏!</gray>"
+      - "<!i><yellow>[提示]</yellow> <gray>禁止使用外挂、作弊等行为!</gray>"
+      - "<!i><yellow>[提示]</yellow> <gray>遇到问题请联系管理员!</gray>"
+    sound: ""
+    sound-volume: 1.0
+    sound-pitch: 1.0
+
+  # VIP专属公告
+  vip_notice:
+    enabled: false
+    permission: "fotiachat.vip"
+    interval: 1200
+    messages:
+      - "<!i><gold>[VIP专属]</gold> <yellow>感谢您的支持! 享受专属福利~</yellow>"
+    sound: "BLOCK_NOTE_BLOCK_CHIME"
+    sound-volume: 0.8
+    sound-pitch: 1.2
+    # 悬浮显示
+    hover:
+      enabled: true
+      text:
+        - "<!i><gold>VIP专属福利</gold>"
+        - "<!i><gray>点击查看详情</gray>"
+    # 点击事件
+    click:
+      enabled: true
+      action: RUN_COMMAND
+      value: "/vip info"
+
+  # 活动公告 - 带点击功能示例
+  event:
+    enabled: false
+    permission: ""
+    interval: 300
+    messages:
+      - "<!i><light_purple>★</light_purple> <gradient:#FF6B6B:#FFE66D>限时活动进行中!</gradient> <light_purple>★</light_purple>"
+      - "<!i><gray>点击查看活动详情</gray>"
+    sound: "ENTITY_FIREWORK_ROCKET_LAUNCH"
+    sound-volume: 0.6
+    sound-pitch: 1.0
+    # 悬浮显示
+    hover:
+      enabled: true
+      text:
+        - "<!i><gradient:#FF6B6B:#FFE66D>限时活动</gradient>"
+        - "<!i><gray>活动时间: 2024/1/1 - 2024/1/7</gray>"
+        - "<!i><yellow>点击参与活动!</yellow>"
+    # 点击事件
+    click:
+      enabled: true
+      action: RUN_COMMAND
+      value: "/event join"
+
+  # 网站公告 - 打开链接示例
+  website:
+    enabled: false
+    permission: ""
+    interval: 1800
+    messages:
+      - "<!i><aqua>[官网]</aqua> <white>访问我们的官方网站获取更多信息!</white>"
+    sound: ""
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    hover:
+      enabled: true
+      text:
+        - "<!i><aqua>点击访问官网</aqua>"
+        - "<!i><gray>www.example.com</gray>"
+    click:
+      enabled: true
+      action: OPEN_URL
+      value: "https://www.example.com"
+
+  # 命令建议示例
+  help_command:
+    enabled: false
+    permission: ""
+    interval: 1200
+    messages:
+      - "<!i><green>[帮助]</green> <gray>需要帮助? 点击这里!</gray>"
+    sound: ""
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    hover:
+      enabled: true
+      text:
+        - "<!i><green>获取帮助</green>"
+        - "<!i><gray>点击输入帮助命令</gray>"
+    click:
+      enabled: true
+      action: SUGGEST_COMMAND
+      value: "/help "

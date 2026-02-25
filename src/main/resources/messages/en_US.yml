@@ -1,0 +1,104 @@
+# FotiaChat English Language File
+
+# Message prefix
+prefix: "<!i><gradient:#FF6B6B:#4ECDC4>[FotiaChat]</gradient> "
+
+# General messages
+general:
+  reload-success: "<!i><green>Configuration reloaded successfully!"
+  no-permission: "<!i><red>You don't have permission to execute this command!"
+  player-only: "<!i><red>This command can only be executed by players!"
+  invalid-args: "<!i><red>Invalid arguments! Usage: {usage}"
+  player-not-found: "<!i><red>Player not found: {player}"
+  player-offline: "<!i><red>Player {player} is not online!"
+
+# Chat related messages
+chat:
+  muted: "<!i><red>You are muted and cannot send messages!"
+  mute-expired: "<!i><green>Your mute has expired, you can now send messages!"
+  cooldown: "<!i><red>Sending messages too fast! Please wait {time} before trying again!"
+  empty-message: "<!i><red>Cannot send empty message!"
+  message-too-long: "<!i><red>Message is too long! Maximum length: {max}"
+
+# Admin command messages
+admin:
+  mute-success: "<!i><green>Muted player {player} for {duration}"
+  unmute-success: "<!i><green>Unmuted player {player}!"
+  not-muted: "<!i><yellow>Player {player} is not muted!"
+  clear-chat: "<!i><gray>Chat has been cleared by {player}!"
+  mute-exempt: "<!i><red>Player {player} has mute exemption!"
+
+# Channel related messages
+channel:
+  current: "<!i><gray>Your current channel: <white>{channel}</white>"
+  switched: "<!i><green>Switched to channel: <white>{channel}</white>"
+  not-found: "<!i><red>Channel not found: {channel}"
+  no-permission: "<!i><red>You don't have permission to use this channel!"
+  list-header: "<!i><gray>Available channels:"
+  list-item: "<!i><gray>- <white>{channel}</white> ({shortcut})"
+
+# Color related messages
+color:
+  current: "<!i><gray>Your current chat color: {color}"
+  help: "<!i><gray>Usage: /chatcolor <colorID|list|reset>"
+  set-success: "<!i><green>Chat color set to: {color}"
+  reset: "<!i><green>Chat color reset to default!"
+  not-found: "<!i><red>Color not found: {color}"
+  no-permission: "<!i><red>You don't have permission to use color: {color}"
+  list-header: "<!i><gray>========== Available Colors =========="
+  list-item: "<!i><gray>- {name} <dark_gray>({id})</dark_gray> {preview}"
+  list-footer: "<!i><gray>======================================"
+  no-colors-available: "<!i><yellow>No colors available!"
+
+# Filter related messages
+filter:
+  blocked: "<!i><red>Your message contains sensitive words and has been blocked!"
+  warning: "<!i><yellow>Please use appropriate language!"
+
+# Private message related messages
+privatemsg:
+  format-sender: "<!i><gray>[<gold>Me</gold> -> <white>{target}</white>]</gray> {message}"
+  format-receiver: "<!i><gray>[<white>{sender}</white> -> <gold>Me</gold>]</gray> {message}"
+  self: "<!i><red>You cannot send a private message to yourself!"
+  no-reply-target: "<!i><red>No one to reply to!"
+  target-offline: "<!i><red>Target player is offline!"
+  socialspy-enabled: "<!i><green>Social spy mode enabled!"
+  socialspy-disabled: "<!i><yellow>Social spy mode disabled!"
+  socialspy-format: "<!i><dark_gray>[Spy] <gray>{sender}</gray> -> <gray>{target}</gray>:</dark_gray> {message}"
+
+# Cross-server communication messages
+crossserver:
+  chat-format: "<!i><dark_gray>[{server}]</dark_gray> <gray>[{channel}]</gray> <white>{player}</white><gray>:</gray> {message}"
+  broadcast-format: "<!i><dark_gray>[{server}]</dark_gray> <gold>{message}</gold>"
+
+# Announcement related messages
+announcement:
+  sent: "<!i><green>Announcement sent: {id}"
+  not-found: "<!i><red>Announcement not found: {id}"
+  broadcast-success: "<!i><green>Message broadcasted!"
+  toggle-enabled: "<!i><green>Auto announcements enabled!"
+  toggle-disabled: "<!i><yellow>Auto announcements disabled!"
+  reloaded: "<!i><green>Announcement configuration reloaded!"
+  list-header: "<!i><gray>========== Announcement List =========="
+  list-item: "<!i><gray>- {id} [{status}] (interval: {interval}s)"
+  usage-send: "<!i><red>Usage: /announcement send <ID>"
+  usage-broadcast: "<!i><red>Usage: /announcement broadcast <message>"
+  help-header: "<!i><gray>========== Announcement Help =========="
+  help-send: "<!i><gray>/announcement send <ID> - Send specific announcement"
+  help-broadcast: "<!i><gray>/announcement broadcast <message> - Broadcast custom message"
+  help-list: "<!i><gray>/announcement list - List all announcements"
+  help-toggle: "<!i><gray>/announcement toggle - Toggle auto announcements"
+  help-reload: "<!i><gray>/announcement reload - Reload announcement config"
+
+# Premium module messages
+premium:
+  not-installed: "<!i><red>This feature requires FotiaChat-Premium module to be installed!"
+  feature-disabled: "<!i><red>{feature} feature is not enabled!"
+
+# Item display messages
+item-display:
+  no-permission: "<!i><red>You don't have permission to display items!"
+  view-no-permission: "<!i><red>You don't have permission to view others' inventory/enderchest!"
+  snapshot-expired: "<!i><red>This snapshot has expired!"
+  inventory-title: "<!i>{player}'s Inventory"
+  enderchest-title: "<!i>{player}'s Enderchest"

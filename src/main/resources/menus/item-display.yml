@@ -1,0 +1,137 @@
+# 物品展示配置
+# 玩家可以在聊天中展示手持物品、背包、末影箱
+#
+# 物品显示配置说明:
+#   material: 原版物品材质
+#   craftengine-item: CraftEngine自定义物品ID（可选，优先于material）
+#   item_model: 物品模型（1.21.4+）
+#   model_data: CustomModelData值（用于旧版资源包）
+#   name: 物品名称
+#   lore: 物品描述
+
+# 快照过期时间（秒）
+# 背包和末影箱快照在此时间后过期
+snapshot-expire-time: 300
+
+# ==================== 手持物品展示 ====================
+hand-item:
+  enabled: true
+  # 触发占位符
+  placeholder: "[i]"
+  # 空手时的显示
+  empty-hand: "<!i><gray>[空]</gray>"
+  # 权限
+  permission: "fotiachat.item.hand"
+
+# ==================== 背包展示 ====================
+inventory:
+  enabled: true
+  # 触发占位符
+  placeholder: "[inv]"
+  # 显示格式
+  format: "<!i><gold>[查看背包]</gold>"
+  # 悬浮文本
+  hover:
+    - "<!i><yellow>点击查看 {player} 的背包</yellow>"
+    - "<!i><gray>物品数量: {item_count}</gray>"
+  # 展示权限
+  permission: "fotiachat.item.inventory"
+  # 查看他人背包的权限
+  view-permission: "fotiachat.item.inventory.view"
+
+  # GUI配置
+  gui:
+    # GUI标题
+    Title: "<!i><gold>{player} 的背包</gold>"
+    # GUI布局 (6行)
+    Layout:
+      - 'HCLAB####'
+      - 'iiiiiiiii'
+      - 'iiiiiiiii'
+      - 'iiiiiiiii'
+      - '#########'
+      - 'hhhhhhhhh'
+    # 图标配置
+    Icons:
+      '#':
+        display:
+          material: 'BLACK_STAINED_GLASS_PANE'
+          name: '<!i><dark_gray> '
+          lore: []
+      'H':
+        # 头盔槽位 - 动态显示玩家头盔
+        type: 'armor_helmet'
+        empty:
+          material: 'GRAY_STAINED_GLASS_PANE'
+          name: '<!i><gray>头盔</gray>'
+          lore:
+            - '<!i><dark_gray>未装备'
+      'C':
+        # 胸甲槽位 - 动态显示玩家胸甲
+        type: 'armor_chestplate'
+        empty:
+          material: 'GRAY_STAINED_GLASS_PANE'
+          name: '<!i><gray>胸甲</gray>'
+          lore:
+            - '<!i><dark_gray>未装备'
+      'L':
+        # 护腿槽位 - 动态显示玩家护腿
+        type: 'armor_leggings'
+        empty:
+          material: 'GRAY_STAINED_GLASS_PANE'
+          name: '<!i><gray>护腿</gray>'
+          lore:
+            - '<!i><dark_gray>未装备'
+      'A':
+        # 靴子槽位 - 动态显示玩家靴子
+        type: 'armor_boots'
+        empty:
+          material: 'GRAY_STAINED_GLASS_PANE'
+          name: '<!i><gray>靴子</gray>'
+          lore:
+            - '<!i><dark_gray>未装备'
+      'B':
+        # 副手槽位 - 动态显示玩家副手物品
+        type: 'offhand'
+        empty:
+          material: 'GRAY_STAINED_GLASS_PANE'
+          name: '<!i><gray>副手</gray>'
+          lore:
+            - '<!i><dark_gray>未装备'
+      'i':
+        # 主背包槽位 - 动态显示背包物品
+        type: 'inventory'
+      'h':
+        # 快捷栏槽位 - 动态显示快捷栏物品
+        type: 'hotbar'
+
+# ==================== 末影箱展示 ====================
+enderchest:
+  enabled: true
+  # 触发占位符
+  placeholder: "[ec]"
+  # 显示格式
+  format: "<!i><dark_purple>[查看末影箱]</dark_purple>"
+  # 悬浮文本
+  hover:
+    - "<!i><light_purple>点击查看 {player} 的末影箱</light_purple>"
+    - "<!i><gray>物品数量: {item_count}</gray>"
+  # 展示权限
+  permission: "fotiachat.item.enderchest"
+  # 查看他人末影箱的权限
+  view-permission: "fotiachat.item.enderchest.view"
+
+  # GUI配置
+  gui:
+    # GUI标题
+    Title: "<!i><dark_purple>{player} 的末影箱</dark_purple>"
+    # GUI布局 (3行)
+    Layout:
+      - 'eeeeeeeee'
+      - 'eeeeeeeee'
+      - 'eeeeeeeee'
+    # 图标配置
+    Icons:
+      'e':
+        # 末影箱槽位 - 动态显示末影箱物品
+        type: 'enderchest'

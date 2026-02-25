@@ -1,0 +1,89 @@
+# FotiaChat 频道配置文件
+# 配置聊天频道
+
+# 频道列表
+channels:
+  # 公共频道 - 所有人可见
+  global:
+    # 频道显示名称
+    name: "公共"
+    # 频道类型: PUBLIC(公开), ADMIN(管理员), HELP(求助), LOCAL(范围)
+    type: PUBLIC
+    # 聊天格式
+    # 占位符: {player} - 玩家名, {message} - 消息内容, {channel} - 频道名
+    # 支持MiniMessage格式和PlaceholderAPI占位符
+    format: "<!i><gray>[<white>公共</white>]</gray> <white>{player}</white><gray>:</gray> {message}"
+    # 快捷方式 - 玩家可以用 !消息 快速发送到此频道
+    shortcut: "!"
+    # 是否为默认频道
+    default: true
+    # 玩家名悬浮显示
+    hover:
+      enabled: true
+      # 悬浮文本（支持多行）
+      text:
+        - "<!i><gray>玩家: <white>{player}</white></gray>"
+        - "<!i><gray>点击私聊此玩家</gray>"
+    # 玩家名点击事件
+    click:
+      enabled: true
+      # 动作类型: SUGGEST_COMMAND(建议命令), RUN_COMMAND(执行命令), OPEN_URL(打开链接), COPY_TO_CLIPBOARD(复制到剪贴板)
+      action: SUGGEST_COMMAND
+      # 动作值（支持{player}占位符）
+      value: "/msg {player} "
+
+  # 本地频道 - 范围内可见
+  local:
+    name: "本地"
+    type: LOCAL
+    format: "<!i><gray>[<yellow>本地</yellow>]</gray> <white>{player}</white><gray>:</gray> {message}"
+    shortcut: "#"
+    # 范围半径(格数)
+    radius: 100
+    default: false
+    hover:
+      enabled: true
+      text:
+        - "<!i><gray>玩家: <white>{player}</white></gray>"
+        - "<!i><yellow>本地频道</yellow>"
+    click:
+      enabled: true
+      action: SUGGEST_COMMAND
+      value: "/msg {player} "
+
+  # 管理员频道 - 需要权限
+  admin:
+    name: "管理"
+    type: ADMIN
+    format: "<!i><gray>[<red>管理</red>]</gray> <white>{player}</white><gray>:</gray> {message}"
+    # 使用频道所需权限
+    permission: "fotiachat.channel.admin"
+    shortcut: "@"
+    default: false
+    hover:
+      enabled: true
+      text:
+        - "<!i><gray>管理员: <red>{player}</red></gray>"
+        - "<!i><gray>点击查看信息</gray>"
+    click:
+      enabled: true
+      action: RUN_COMMAND
+      value: "/playerinfo {player}"
+
+  # 求助频道 - 需要权限
+  help:
+    name: "求助"
+    type: HELP
+    format: "<!i><gray>[<aqua>求助</aqua>]</gray> <white>{player}</white><gray>:</gray> {message}"
+    permission: "fotiachat.channel.help"
+    shortcut: "?"
+    default: false
+    hover:
+      enabled: true
+      text:
+        - "<!i><gray>玩家: <white>{player}</white></gray>"
+        - "<!i><aqua>点击帮助此玩家</aqua>"
+    click:
+      enabled: true
+      action: SUGGEST_COMMAND
+      value: "/tp {player}"
