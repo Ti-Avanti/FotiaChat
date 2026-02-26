@@ -108,11 +108,24 @@ public class DatabaseManager {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             """;
 
+        String createIgnoresTable = """
+            CREATE TABLE IF NOT EXISTS fotiachat_ignores (
+                player_uuid VARCHAR(36) NOT NULL,
+                ignored_uuid VARCHAR(36) NOT NULL,
+                ignored_name VARCHAR(16) NOT NULL,
+                PRIMARY KEY (player_uuid, ignored_uuid),
+                INDEX idx_player (player_uuid)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """;
+
         try (Connection conn = getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(createPlayerDataTable)) {
                 stmt.executeUpdate();
             }
             try (PreparedStatement stmt = conn.prepareStatement(createMutesTable)) {
+                stmt.executeUpdate();
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(createIgnoresTable)) {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
@@ -386,4 +399,96 @@ public class DatabaseManager {
      * 禁言数据记录
      */
     public record MuteRecord(UUID uuid, String username, long muteTime, long expireTime, String reason, String mutedBy) {}
+
+    // ==================== 屏蔽相关方法 ====================
+
+    /**
+     * 添加屏蔽
+     */
+    public void addIgnore(UUID playerUuid, UUID ignoredUuid, String ignoredName) {
+        if (!enabled) return;
+
+        String sql = """
+            INSERT IGNORE INTO fotiachat_ignores (player_uuid, ignored_uuid, ignored_name)
+            VALUES (?, ?, ?)
+            """;
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try (Connection conn = getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, playerUuid.toString());
+                stmt.setString(2, ignoredUuid.toString());
+                stmt.setString(3, ignoredName);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().warning("添加屏蔽失败: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 移除屏蔽
+     */
+    public void removeIgnore(UUID playerUuid, UUID ignoredUuid) {
+        if (!enabled) return;
+
+        String sql = "DELETE FROM fotiachat_ignores WHERE player_uuid = ? AND ignored_uuid = ?";
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try (Connection conn = getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, playerUuid.toString());
+                stmt.setString(2, ignoredUuid.toString());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                plugin.getLogger().warning("移除屏蔽失败: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 检查是否屏蔽了某个玩家
+     */
+    public boolean isIgnoring(UUID playerUuid, UUID targetUuid) {
+        if (!enabled) return false;
+
+        String sql = "SELECT 1 FROM fotiachat_ignores WHERE player_uuid = ? AND ignored_uuid = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, playerUuid.toString());
+            stmt.setString(2, targetUuid.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("检查屏蔽状态失败: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * 获取玩家的屏蔽列表
+     */
+    public java.util.List<String> getIgnoreList(UUID playerUuid) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        if (!enabled) return names;
+
+        String sql = "SELECT ignored_name FROM fotiachat_ignores WHERE player_uuid = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, playerUuid.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    names.add(rs.getString("ignored_name"));
+                }
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning("获取屏蔽列表失败: " + e.getMessage());
+        }
+
+        return names;
+    }
 }

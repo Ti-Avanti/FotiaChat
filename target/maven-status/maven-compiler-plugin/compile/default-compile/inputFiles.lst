@@ -26,8 +26,10 @@ D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\listener\MenuListen
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\manager\MessageManager.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\privatemsg\PrivateMessageManager.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\color\ChatColor.java
+D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\command\ChatIgnoreCommand.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\util\TimeUtil.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\announcement\AnnouncementManager.java
+D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\util\LegacyColorConverter.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\color\ColorManager.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\api\AddonInfo.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\menu\MenuIcon.java
@@ -36,6 +38,7 @@ D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\crossserver\CrossSe
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\command\ChatColorCommand.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\listener\PlayerListener.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\menu\Menu.java
+D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\ignore\IgnoreManager.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\command\MuteCommand.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\util\MessageUtil.java
 D:\MC_Plugin\FotiaChat\FotiaChat\src\main\java\gg\fotia\chat\channel\ChannelManager.java

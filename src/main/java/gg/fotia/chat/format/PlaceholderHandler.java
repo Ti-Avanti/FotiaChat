@@ -1,6 +1,7 @@
 package gg.fotia.chat.format;
 
 import gg.fotia.chat.FotiaChat;
+import gg.fotia.chat.util.LegacyColorConverter;
 import gg.fotia.chat.util.MessageUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
@@ -28,7 +29,9 @@ public class PlaceholderHandler {
             return text;
         }
 
-        return PlaceholderAPI.setPlaceholders(player, text);
+        String result = PlaceholderAPI.setPlaceholders(player, text);
+        // 将PAPI返回的旧版颜色代码转换为MiniMessage格式
+        return LegacyColorConverter.convertToMiniMessage(result);
     }
 
     /**

@@ -19,6 +19,7 @@ public class ConfigManager {
     private String language;
     private boolean debugMode;
     private boolean allowColorCodes;
+    private String mutePermission;
 
     public ConfigManager(FotiaChat plugin) {
         this.plugin = plugin;
@@ -44,6 +45,7 @@ public class ConfigManager {
         this.language = config.getString("language", "zh_CN");
         this.debugMode = config.getBoolean("debug", false);
         this.allowColorCodes = config.getBoolean("chat.allow-color-codes", true);
+        this.mutePermission = config.getString("mute.permission", "");
     }
 
     private void saveDefaultConfig() {
@@ -79,5 +81,9 @@ public class ConfigManager {
 
     public boolean isAllowColorCodes() {
         return allowColorCodes;
+    }
+
+    public String getMutePermission() {
+        return mutePermission;
     }
 }

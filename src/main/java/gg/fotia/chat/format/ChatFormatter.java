@@ -3,6 +3,7 @@ package gg.fotia.chat.format;
 import gg.fotia.chat.FotiaChat;
 import gg.fotia.chat.channel.Channel;
 import gg.fotia.chat.itemdisplay.ItemDisplayManager;
+import gg.fotia.chat.util.LegacyColorConverter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -199,7 +200,8 @@ public class ChatFormatter {
      */
     private String parsePlaceholdersRecursively(Player player, String text) {
         if (!gg.fotia.chat.util.MessageUtil.isPlaceholderAPIEnabled() || text == null || !text.contains("%")) {
-            return text;
+            // 即使没有PAPI变量，也要转换可能存在的旧版颜色代码
+            return LegacyColorConverter.convertToMiniMessage(text);
         }
 
         String result = text;
@@ -216,7 +218,8 @@ public class ChatFormatter {
             }
         }
 
-        return result;
+        // 确保最终结果也经过颜色转换
+        return LegacyColorConverter.convertToMiniMessage(result);
     }
 
     /**

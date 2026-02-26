@@ -9,6 +9,7 @@ import gg.fotia.chat.command.*;
 import gg.fotia.chat.crossserver.CrossServerManager;
 import gg.fotia.chat.filter.FilterManager;
 import gg.fotia.chat.format.ChatFormatter;
+import gg.fotia.chat.ignore.IgnoreManager;
 import gg.fotia.chat.itemdisplay.ItemDisplayManager;
 import gg.fotia.chat.listener.ChatListener;
 import gg.fotia.chat.listener.MenuListener;
@@ -38,6 +39,7 @@ public class FotiaChat extends JavaPlugin {
     private AddonManager addonManager;
     private DatabaseManager databaseManager;
     private ItemDisplayManager itemDisplayManager;
+    private IgnoreManager ignoreManager;
 
     @Override
     public void onEnable() {
@@ -73,6 +75,10 @@ public class FotiaChat extends JavaPlugin {
         // 初始化禁言管理器
         this.muteManager = new MuteManager(this);
         this.muteManager.load();
+
+        // 初始化屏蔽管理器
+        this.ignoreManager = new IgnoreManager(this);
+        this.ignoreManager.load();
 
         // 初始化私聊管理器
         this.privateMessageManager = new PrivateMessageManager(this);
@@ -148,6 +154,11 @@ public class FotiaChat extends JavaPlugin {
         PremiumPlaceholderCommand chatbgPlaceholder = new PremiumPlaceholderCommand(this, "喊话背景");
         getCommand("chatbg").setExecutor(chatbgPlaceholder);
         getCommand("chatbg").setTabCompleter(chatbgPlaceholder);
+
+        // 注册屏蔽命令
+        ChatIgnoreCommand chatIgnoreCommand = new ChatIgnoreCommand(this);
+        getCommand("chatignore").setExecutor(chatIgnoreCommand);
+        getCommand("chatignore").setTabCompleter(chatIgnoreCommand);
 
         // 初始化Addon管理器（在命令注册之后，这样Addon可以覆盖占位命令）
         this.addonManager = new AddonManager(this);
@@ -241,6 +252,10 @@ public class FotiaChat extends JavaPlugin {
         return itemDisplayManager;
     }
 
+    public IgnoreManager getIgnoreManager() {
+        return ignoreManager;
+    }
+
     public void reload() {
         configManager.loadConfig();
         messageManager.loadMessages();
@@ -248,6 +263,7 @@ public class FotiaChat extends JavaPlugin {
         colorManager.load();
         filterManager.load();
         muteManager.load();
+        ignoreManager.load();
         crossServerManager.load();
         menuManager.load();
         announcementManager.load();

@@ -102,3 +102,12 @@ item-display:
   snapshot-expired: "<!i><red>该快照已过期!"
   inventory-title: "<!i>{player} 的背包"
   enderchest-title: "<!i>{player} 的末影箱"
+
+# 屏蔽玩家相关消息
+ignore:
+  added: "<!i><green>已屏蔽玩家 {player} 的聊天消息!"
+  removed: "<!i><yellow>已取消屏蔽玩家 {player}!"
+  self: "<!i><red>你不能屏蔽自己!"
+  list-header: "<!i><gray>========== 已屏蔽的玩家 =========="
+  list-item: "<!i><gray>- <white>{player}</white>"
+  list-empty: "<!i><yellow>你没有屏蔽任何玩家!"

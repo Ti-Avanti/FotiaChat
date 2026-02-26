@@ -187,23 +187,71 @@ public class MuteManager {
      * 检查玩家是否被禁言
      */
     public boolean isMuted(Player player) {
-        return isMuted(player.getUniqueId());
+        // 先检查权限禁言
+        String mutePermission = plugin.getConfigManager().getMutePermission();
+        if (mutePermission != null && !mutePermission.isEmpty()) {
+            if (player.hasPermission(mutePermission)) {
+                return true;
+            }
+        }
+        // 再检查普通禁言（支持实时同步）
+        return isMutedWithSync(player.getUniqueId());
+    }
+
+    /**
+     * 检查玩家是否被禁言(通过UUID)，支持数据库实时同步
+     */
+    private boolean isMutedWithSync(UUID uuid) {
+        DatabaseManager dbManager = plugin.getDatabaseManager();
+
+        // 如果启用了数据库，优先从数据库实时查询（支持跨服同步）
+        if (dbManager != null && dbManager.isEnabled()) {
+            DatabaseManager.MuteRecord record = dbManager.loadMute(uuid);
+            if (record != null) {
+                MuteData data = new MuteData(
+                        record.uuid(),
+                        record.username(),
+                        record.muteTime(),
+                        record.expireTime(),
+                        record.reason(),
+                        record.mutedBy()
+                );
+                if (!data.isExpired()) {
+                    // 更新本地缓存
+                    mutedPlayers.put(uuid, data);
+                    return true;
+                } else {
+                    // 删除过期记录
+                    mutedPlayers.remove(uuid);
+                    dbManager.deleteMute(uuid);
+                    return false;
+                }
+            } else {
+                // 数据库中没有记录，清除本地缓存
+                mutedPlayers.remove(uuid);
+                return false;
+            }
+        }
+
+        // 未启用数据库，使用本地缓存
+        MuteData localData = mutedPlayers.get(uuid);
+        if (localData != null) {
+            if (localData.isExpired()) {
+                mutedPlayers.remove(uuid);
+                save();
+                return false;
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * 检查玩家是否被禁言(通过UUID)
      */
     public boolean isMuted(UUID uuid) {
-        MuteData data = mutedPlayers.get(uuid);
-        if (data == null) {
-            return false;
-        }
-        if (data.isExpired()) {
-            mutedPlayers.remove(uuid);
-            save();
-            return false;
-        }
-        return true;
+        return isMutedWithSync(uuid);
     }
 
     /**

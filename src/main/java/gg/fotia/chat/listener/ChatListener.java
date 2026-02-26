@@ -4,6 +4,8 @@ import gg.fotia.chat.FotiaChat;
 import gg.fotia.chat.channel.Channel;
 import gg.fotia.chat.channel.ChannelManager;
 import gg.fotia.chat.format.ChatFormatter;
+import gg.fotia.chat.ignore.IgnoreManager;
+import gg.fotia.chat.util.LegacyColorConverter;
 import gg.fotia.chat.util.MessageUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -25,11 +27,13 @@ public class ChatListener implements Listener {
     private final FotiaChat plugin;
     private final ChannelManager channelManager;
     private final ChatFormatter chatFormatter;
+    private final IgnoreManager ignoreManager;
 
     public ChatListener(FotiaChat plugin) {
         this.plugin = plugin;
         this.channelManager = plugin.getChannelManager();
         this.chatFormatter = plugin.getChatFormatter();
+        this.ignoreManager = plugin.getIgnoreManager();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -80,6 +84,9 @@ public class ChatListener implements Listener {
         // 应用玩家颜色
         message = plugin.getColorManager().applyPlayerColor(player, message);
 
+        // 转换旧版颜色代码为MiniMessage格式
+        message = LegacyColorConverter.convertToMiniMessage(message);
+
         // 格式化消息
         final String finalMessage = message;
         final Channel finalChannel = channel;
@@ -93,9 +100,12 @@ public class ChatListener implements Listener {
             recipients = new HashSet<>(Bukkit.getOnlinePlayers());
         }
 
-        // 发送消息给所有接收者
+        // 发送消息给所有接收者（排除屏蔽了发送者的玩家）
         for (Player recipient : recipients) {
-            recipient.sendMessage(formattedMessage);
+            // 检查接收者是否屏蔽了发送者
+            if (!ignoreManager.isIgnoring(recipient.getUniqueId(), player.getUniqueId())) {
+                recipient.sendMessage(formattedMessage);
+            }
         }
 
         // 发送到控制台

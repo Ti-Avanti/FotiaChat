@@ -31,6 +31,13 @@ chat:
   # 是否允许玩家在消息中使用颜色代码
   allow-color-codes: true
 
+# 禁言设置
+mute:
+  # 权限禁言功能
+  # 拥有此权限的玩家将被禁言（无法发送聊天消息）
+  # 留空则禁用此功能
+  permission: ""
+
 # 跨服通信设置
 cross-server:
   # 是否启用跨服通信

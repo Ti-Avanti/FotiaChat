@@ -63,6 +63,11 @@ commands:
     usage: /chatbg [背景ID]
     aliases: [background, bg]
     permission: fotiachat.premium.background
+  chatignore:
+    description: 屏蔽玩家聊天
+    usage: /chatignore <玩家名|list>
+    aliases: [ignore, block]
+    permission: fotiachat.command.chatignore
 
 permissions:
   fotiachat.command.channel:
@@ -125,3 +130,6 @@ permissions:
   fotiachat.premium.background.*:
     description: 允许使用所有背景
     default: op
+  fotiachat.command.chatignore:
+    description: 允许使用屏蔽玩家命令
+    default: true

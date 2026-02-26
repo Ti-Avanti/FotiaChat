@@ -1,4 +1,6 @@
 gg\fotia\chat\crossserver\CrossServerMessage.class
+gg\fotia\chat\ignore\IgnoreManager.class
+gg\fotia\chat\command\ChatIgnoreCommand.class
 gg\fotia\chat\format\PlaceholderHandler.class
 gg\fotia\chat\filter\FilterType.class
 gg\fotia\chat\menu\MenuIcon.class
@@ -47,6 +49,7 @@ gg\fotia\chat\format\ChatFormatter.class
 gg\fotia\chat\manager\ConfigManager.class
 gg\fotia\chat\privatemsg\PrivateMessageManager.class
 gg\fotia\chat\command\ChatColorCommand.class
+gg\fotia\chat\util\LegacyColorConverter.class
 gg\fotia\chat\api\FotiaChatAPI.class
 gg\fotia\chat\filter\FilterRule$ReplaceMode.class
 gg\fotia\chat\command\MsgCommand.class
