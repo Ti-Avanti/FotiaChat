@@ -16,6 +16,7 @@ public record ItemSnapshot(
         long expireTime
 ) {
     public enum Type {
+        HAND_ITEM,
         INVENTORY,
         ENDERCHEST
     }

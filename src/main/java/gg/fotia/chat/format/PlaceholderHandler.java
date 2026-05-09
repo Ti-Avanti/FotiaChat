@@ -6,6 +6,7 @@ import gg.fotia.chat.util.MessageUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
+
 /**
  * PlaceholderAPI占位符处理器
  */

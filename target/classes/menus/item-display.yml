@@ -3,14 +3,11 @@
 #
 # 物品显示配置说明:
 #   material: 原版物品材质
-#   craftengine-item: CraftEngine自定义物品ID（可选，优先于material）
-#   item_model: 物品模型（1.21.4+）
-#   model_data: CustomModelData值（用于旧版资源包）
 #   name: 物品名称
 #   lore: 物品描述
 
 # 快照过期时间（秒）
-# 背包和末影箱快照在此时间后过期
+# 背包、末影箱、手持物品 GUI 快照会在此时间后过期
 snapshot-expire-time: 300
 
 # ==================== 手持物品展示 ====================
@@ -19,9 +16,40 @@ hand-item:
   # 触发占位符
   placeholder: "[i]"
   # 空手时的显示
-  empty-hand: "<!i><gray>[空]</gray>"
-  # 权限
+  empty-hand: "<!i><gray>[空手]</gray>"
+  # 展示权限
   permission: "fotiachat.item.hand"
+  # 展示模式: NATIVE(原生 show_item), GUI(点击打开 GUI)
+  display-mode: "NATIVE"
+  # GUI 模式下聊天中的显示文本
+  # 可用占位符: {item_name}, {amount}
+  gui-display: "<!i><aqua>[{item_name}]</aqua>"
+  # GUI 模式下的悬浮文本
+  # 可用占位符: {item_name}, {amount}, {lore}, {enchantments}
+  gui-hover:
+    - "<!i><gray>物品: <white>{item_name}</white></gray>"
+    - "<!i><yellow>点击打开 GUI 查看物品</yellow>"
+
+  # GUI 配置
+  gui:
+    # GUI 标题
+    # 可用占位符: {player}, {item_name}, {amount}
+    Title: "<!i><aqua>{player} 展示的物品</aqua>"
+    # GUI 布局 (3行)
+    Layout:
+      - '#########'
+      - '####i####'
+      - '#########'
+    # 图标配置
+    Icons:
+      '#':
+        display:
+          material: 'BLACK_STAINED_GLASS_PANE'
+          name: '<!i><dark_gray> '
+          lore: []
+      'i':
+        # 单物品槽位 - 动态显示玩家手持物品
+        type: 'hand_item'
 
 # ==================== 背包展示 ====================
 inventory:
@@ -36,14 +64,14 @@ inventory:
     - "<!i><gray>物品数量: {item_count}</gray>"
   # 展示权限
   permission: "fotiachat.item.inventory"
-  # 查看他人背包的权限
+  # 查看他人背包权限
   view-permission: "fotiachat.item.inventory.view"
 
-  # GUI配置
+  # GUI 配置
   gui:
-    # GUI标题
+    # GUI 标题
     Title: "<!i><gold>{player} 的背包</gold>"
-    # GUI布局 (6行)
+    # GUI 布局 (6行)
     Layout:
       - 'HCLAB####'
       - 'iiiiiiiii'
@@ -118,14 +146,14 @@ enderchest:
     - "<!i><gray>物品数量: {item_count}</gray>"
   # 展示权限
   permission: "fotiachat.item.enderchest"
-  # 查看他人末影箱的权限
+  # 查看他人末影箱权限
   view-permission: "fotiachat.item.enderchest.view"
 
-  # GUI配置
+  # GUI 配置
   gui:
-    # GUI标题
+    # GUI 标题
     Title: "<!i><dark_purple>{player} 的末影箱</dark_purple>"
-    # GUI布局 (3行)
+    # GUI 布局 (3行)
     Layout:
       - 'eeeeeeeee'
       - 'eeeeeeeee'

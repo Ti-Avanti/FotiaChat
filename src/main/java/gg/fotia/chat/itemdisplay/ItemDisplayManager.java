@@ -2,7 +2,6 @@ package gg.fotia.chat.itemdisplay;
 
 import gg.fotia.chat.FotiaChat;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 物品展示管理器
+ * 鐗╁搧灞曠ず绠＄悊鍣?
  */
 public class ItemDisplayManager {
 
@@ -35,11 +34,14 @@ public class ItemDisplayManager {
     private ItemDisplayGuiManager guiManager;
     private FileConfiguration itemDisplayConfig;
 
-    // 配置
+    // 閰嶇疆
     private boolean handItemEnabled;
     private String handItemPlaceholder;
     private String handItemEmptyHand;
     private String handItemPermission;
+    private HandItemDisplayMode handItemDisplayMode = HandItemDisplayMode.NATIVE;
+    private String handItemGuiDisplay = "<!i><aqua>[{item_name}]</aqua>";
+    private List<String> handItemGuiHover = List.of();
 
     private boolean inventoryEnabled;
     private String inventoryPlaceholder;
@@ -64,7 +66,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 加载配置
+     * 鍔犺浇閰嶇疆
      */
     public void load() {
         saveDefaultConfig();
@@ -72,7 +74,7 @@ public class ItemDisplayManager {
         File configFile = new File(plugin.getDataFolder(), "menus/item-display.yml");
         itemDisplayConfig = YamlConfiguration.loadConfiguration(configFile);
 
-        // 合并默认配置
+        // 鍚堝苟榛樿閰嶇疆
         InputStream defaultStream = plugin.getResource("menus/item-display.yml");
         if (defaultStream != null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(
@@ -80,49 +82,52 @@ public class ItemDisplayManager {
             itemDisplayConfig.setDefaults(defaultConfig);
         }
 
-        // 快照过期时间（秒）
+        // 蹇収杩囨湡鏃堕棿锛堢锛?
         snapshotExpireTime = itemDisplayConfig.getInt("snapshot-expire-time", 300);
 
-        // 手持物品配置
+        // 鎵嬫寔鐗╁搧閰嶇疆
         ConfigurationSection handConfig = itemDisplayConfig.getConfigurationSection("hand-item");
         if (handConfig != null) {
             handItemEnabled = handConfig.getBoolean("enabled", true);
             handItemPlaceholder = handConfig.getString("placeholder", "[i]");
-            handItemEmptyHand = handConfig.getString("empty-hand", "<!i><gray>[空]</gray>");
+            handItemEmptyHand = handConfig.getString("empty-hand", "<!i><gray>[绌篯</gray>");
             handItemPermission = handConfig.getString("permission", "fotiachat.item.hand");
+            handItemDisplayMode = HandItemDisplayMode.fromId(handConfig.getString("display-mode", "NATIVE"));
+            handItemGuiDisplay = handConfig.getString("gui-display", "<!i><aqua>[{item_name}]</aqua>");
+            handItemGuiHover = handConfig.getStringList("gui-hover");
         }
 
-        // 背包配置
+        // 鑳屽寘閰嶇疆
         ConfigurationSection invConfig = itemDisplayConfig.getConfigurationSection("inventory");
         if (invConfig != null) {
             inventoryEnabled = invConfig.getBoolean("enabled", true);
             inventoryPlaceholder = invConfig.getString("placeholder", "[inv]");
-            inventoryFormat = invConfig.getString("format", "<!i><gold>[查看背包]</gold>");
+            inventoryFormat = invConfig.getString("format", "<!i><gold>[鏌ョ湅鑳屽寘]</gold>");
             inventoryHover = invConfig.getStringList("hover");
             inventoryPermission = invConfig.getString("permission", "fotiachat.item.inventory");
             inventoryViewPermission = invConfig.getString("view-permission", "fotiachat.item.inventory.view");
         }
 
-        // 末影箱配置
+        // 鏈奖绠遍厤缃?
         ConfigurationSection ecConfig = itemDisplayConfig.getConfigurationSection("enderchest");
         if (ecConfig != null) {
             enderchestEnabled = ecConfig.getBoolean("enabled", true);
             enderchestPlaceholder = ecConfig.getString("placeholder", "[ec]");
-            enderchestFormat = ecConfig.getString("format", "<!i><dark_purple>[查看末影箱]</dark_purple>");
+            enderchestFormat = ecConfig.getString("format", "<!i><dark_purple>[鏌ョ湅鏈奖绠盷</dark_purple>");
             enderchestHover = ecConfig.getStringList("hover");
             enderchestPermission = ecConfig.getString("permission", "fotiachat.item.enderchest");
             enderchestViewPermission = ecConfig.getString("view-permission", "fotiachat.item.enderchest.view");
         }
 
-        // 启动清理任务
+        // 鍚姩娓呯悊浠诲姟
         startCleanupTask();
 
-        // 加载GUI配置
+        // 鍔犺浇GUI閰嶇疆
         guiManager.load(itemDisplayConfig);
     }
 
     /**
-     * 保存默认配置文件
+     * 淇濆瓨榛樿閰嶇疆鏂囦欢
      */
     private void saveDefaultConfig() {
         File configFile = new File(plugin.getDataFolder(), "menus/item-display.yml");
@@ -132,7 +137,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 处理消息中的物品展示占位符
+     * 澶勭悊娑堟伅涓殑鐗╁搧灞曠ず鍗犱綅绗?
      */
     public Component processMessage(Player player, String message) {
         if (message == null || message.isEmpty()) {
@@ -150,7 +155,7 @@ public class ItemDisplayManager {
             int ecIndex = enderchestEnabled && enderchestPlaceholder != null ?
                     remaining.indexOf(enderchestPlaceholder) : -1;
 
-            // 找到最近的占位符
+            // 鎵惧埌鏈€杩戠殑鍗犱綅绗?
             int minIndex = -1;
             String placeholder = null;
             String type = null;
@@ -172,25 +177,25 @@ public class ItemDisplayManager {
             }
 
             if (minIndex < 0) {
-                // 没有更多占位符
+                // 娌℃湁鏇村鍗犱綅绗?
                 parts.add(miniMessage.deserialize(remaining));
                 break;
             }
 
-            // 添加占位符之前的文本
+            // 娣诲姞鍗犱綅绗︿箣鍓嶇殑鏂囨湰
             if (minIndex > 0) {
                 parts.add(miniMessage.deserialize(remaining.substring(0, minIndex)));
             }
 
-            // 处理占位符
+            // 澶勭悊鍗犱綅绗?
             Component itemComponent = processPlaceholder(player, type);
             parts.add(itemComponent);
 
-            // 继续处理剩余文本
+            // 缁х画澶勭悊鍓╀綑鏂囨湰
             remaining = remaining.substring(minIndex + placeholder.length());
         }
 
-        // 合并所有部分
+        // 鍚堝苟鎵€鏈夐儴鍒?
         Component result = Component.empty();
         for (Component part : parts) {
             result = result.append(part);
@@ -199,7 +204,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 处理单个占位符
+     * 澶勭悊鍗曚釜鍗犱綅绗?
      */
     private Component processPlaceholder(Player player, String type) {
         return switch (type) {
@@ -211,7 +216,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 处理手持物品展示
+     * 澶勭悊鎵嬫寔鐗╁搧灞曠ず
      */
     private Component processHandItem(Player player) {
         if (!player.hasPermission(handItemPermission)) {
@@ -223,70 +228,113 @@ public class ItemDisplayManager {
             return miniMessage.deserialize(handItemEmptyHand);
         }
 
-        // 直接使用物品的显示名称（带方括号），并添加 showItem 悬浮事件
-        // 这样会显示物品的完整信息，就像原版聊天展示物品一样
-        Component itemComponent = item.displayName()
-                .hoverEvent(item.asHoverEvent());
+        if (handItemDisplayMode == HandItemDisplayMode.GUI) {
+            return processHandItemGui(player, item);
+        }
 
-        return itemComponent;
+        return processHandItemNative(item);
     }
 
     /**
-     * 处理背包展示
+     * 处理原生手持物品展示
      */
+    private Component processHandItemNative(ItemStack item) {
+        return item.displayName().hoverEvent(item.asHoverEvent());
+    }
+
+    /**
+     * 处理 GUI 手持物品展示
+     */
+    private Component processHandItemGui(Player player, ItemStack item) {
+        UUID snapshotId = createHandItemSnapshot(player, item);
+        Component component = buildHandItemDisplayComponent(item);
+
+        if (handItemGuiHover != null && !handItemGuiHover.isEmpty()) {
+            component = component.hoverEvent(HoverEvent.showText(buildItemHover(item, handItemGuiHover)));
+        }
+
+        return component.clickEvent(ClickEvent.runCommand("/fotiachat viewsnapshot " + snapshotId));
+    }
+
+    private Component buildHandItemDisplayComponent(ItemStack item) {
+        String safeFormat = handItemGuiDisplay == null || handItemGuiDisplay.isEmpty()
+                ? "<!i><aqua>[{item_name}]</aqua>"
+                : handItemGuiDisplay;
+
+        String processed = safeFormat
+                .replace("{amount}", String.valueOf(item.getAmount()))
+                .replace("{item_name}", "<item_name>");
+
+        return miniMessage.deserialize(
+                processed,
+                net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component(
+                        "item_name",
+                        getItemDisplayNameComponent(item)
+                )
+        );
+    }
+
+    private String buildHandItemDisplayText(ItemStack item) {
+        String safeFormat = handItemGuiDisplay == null || handItemGuiDisplay.isEmpty()
+                ? "<!i><aqua>[{item_name}]</aqua>"
+                : handItemGuiDisplay;
+
+        return safeFormat.replace("{item_name}", getItemDisplayName(item))
+                .replace("{amount}", String.valueOf(item.getAmount()));
+    }
     private Component processInventory(Player player) {
         if (!player.hasPermission(inventoryPermission)) {
             return Component.empty();
         }
 
-        // 创建快照
+        // 鍒涘缓蹇収
         UUID snapshotId = createInventorySnapshot(player);
         int itemCount = countItems(player.getInventory().getContents());
 
         String format = inventoryFormat;
         Component component = miniMessage.deserialize(format);
 
-        // 添加悬浮文本
+        // 娣诲姞鎮诞鏂囨湰
         if (inventoryHover != null && !inventoryHover.isEmpty()) {
             Component hoverText = buildSnapshotHover(player.getName(), itemCount, inventoryHover);
             component = component.hoverEvent(HoverEvent.showText(hoverText));
         }
 
-        // 添加点击事件（运行命令查看快照）
+        // 娣诲姞鐐瑰嚮浜嬩欢锛堣繍琛屽懡浠ゆ煡鐪嬪揩鐓э級
         component = component.clickEvent(ClickEvent.runCommand("/fotiachat viewsnapshot " + snapshotId));
 
         return component;
     }
 
     /**
-     * 处理末影箱展示
+     * 澶勭悊鏈奖绠卞睍绀?
      */
     private Component processEnderchest(Player player) {
         if (!player.hasPermission(enderchestPermission)) {
             return Component.empty();
         }
 
-        // 创建快照
+        // 鍒涘缓蹇収
         UUID snapshotId = createEnderchestSnapshot(player);
         int itemCount = countItems(player.getEnderChest().getContents());
 
         String format = enderchestFormat;
         Component component = miniMessage.deserialize(format);
 
-        // 添加悬浮文本
+        // 娣诲姞鎮诞鏂囨湰
         if (enderchestHover != null && !enderchestHover.isEmpty()) {
             Component hoverText = buildSnapshotHover(player.getName(), itemCount, enderchestHover);
             component = component.hoverEvent(HoverEvent.showText(hoverText));
         }
 
-        // 添加点击事件（运行命令查看快照）
+        // 娣诲姞鐐瑰嚮浜嬩欢锛堣繍琛屽懡浠ゆ煡鐪嬪揩鐓э級
         component = component.clickEvent(ClickEvent.runCommand("/fotiachat viewsnapshot " + snapshotId));
 
         return component;
     }
 
     /**
-     * 构建物品悬浮文本
+     * 鏋勫缓鐗╁搧鎮诞鏂囨湰
      */
     private Component buildItemHover(ItemStack item, List<String> hoverLines) {
         List<Component> lines = new ArrayList<>();
@@ -296,7 +344,7 @@ public class ItemDisplayManager {
         boolean hasEnchants = !item.getEnchantments().isEmpty();
 
         for (String line : hoverLines) {
-            // 跳过空的lore和enchantments行
+            // 璺宠繃绌虹殑lore鍜宔nchantments琛?
             if (line.contains("{lore}") && loreText.isEmpty()) {
                 continue;
             }
@@ -304,16 +352,16 @@ public class ItemDisplayManager {
                 continue;
             }
 
-            // 处理 {enchantments} 占位符（使用组件以支持本地化）
+            // 澶勭悊 {enchantments} 鍗犱綅绗︼紙浣跨敤缁勪欢浠ユ敮鎸佹湰鍦板寲锛?
             if (line.contains("{enchantments}") && hasEnchants) {
-                // 如果行只有 {enchantments}，直接添加附魔组件
+                // 濡傛灉琛屽彧鏈?{enchantments}锛岀洿鎺ユ坊鍔犻檮榄旂粍浠?
                 if (line.trim().equals("{enchantments}")) {
                     lines.add(enchantComponent);
                     continue;
                 }
             }
 
-            // 处理 {lore} 占位符
+            // 澶勭悊 {lore} 鍗犱綅绗?
             if (line.contains("{lore}") && !loreText.isEmpty()) {
                 if (line.trim().equals("{lore}")) {
                     lines.add(miniMessage.deserialize(loreText));
@@ -321,12 +369,12 @@ public class ItemDisplayManager {
                 }
             }
 
-            // 使用 MiniMessage 占位符处理 <item_name> 和其他占位符
+            // 浣跨敤 MiniMessage 鍗犱綅绗﹀鐞?<item_name> 鍜屽叾浠栧崰浣嶇
             String processed = line
                     .replace("{amount}", String.valueOf(item.getAmount()))
                     .replace("{lore}", loreText)
                     .replace("{enchantments}", "")
-                    .replace("{item_name}", "<item_name>"); // 转换为 MiniMessage 格式
+                    .replace("{item_name}", "<item_name>"); // 杞崲涓?MiniMessage 鏍煎紡
 
             if (!processed.trim().isEmpty()) {
                 Component lineComponent = miniMessage.deserialize(processed,
@@ -346,7 +394,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 构建快照悬浮文本
+     * 鏋勫缓蹇収鎮诞鏂囨湰
      */
     private Component buildSnapshotHover(String playerName, int itemCount, List<String> hoverLines) {
         List<Component> lines = new ArrayList<>();
@@ -369,27 +417,27 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取物品显示名称（字符串形式）
+     * 鑾峰彇鐗╁搧鏄剧ず鍚嶇О锛堝瓧绗︿覆褰㈠紡锛?
      */
     private String getItemDisplayName(ItemStack item) {
         if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
             return PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
         }
-        // 使用物品类型名称
+        // 浣跨敤鐗╁搧绫诲瀷鍚嶇О
         return formatMaterialName(item.getType());
     }
 
     /**
-     * 获取物品显示名称组件（支持客户端本地化和CraftEngine自定义名称）
+     * 鑾峰彇鐗╁搧鏄剧ず鍚嶇О缁勪欢锛堟敮鎸佸鎴风鏈湴鍖栧拰CraftEngine鑷畾涔夊悕绉帮級
      */
     private Component getItemDisplayNameComponent(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            // 优先检查 displayName（自定义名称）
+            // 浼樺厛妫€鏌?displayName锛堣嚜瀹氫箟鍚嶇О锛?
             if (meta.hasDisplayName()) {
                 return meta.displayName();
             }
-            // 尝试使用 itemName（1.20.5+ 的物品名称组件）
+            // 灏濊瘯浣跨敤 itemName锛?.20.5+ 鐨勭墿鍝佸悕绉扮粍浠讹級
             try {
                 java.lang.reflect.Method hasItemNameMethod = meta.getClass().getMethod("hasItemName");
                 boolean hasItemName = (boolean) hasItemNameMethod.invoke(meta);
@@ -398,15 +446,15 @@ public class ItemDisplayManager {
                     return (Component) itemNameMethod.invoke(meta);
                 }
             } catch (Exception ignored) {
-                // 旧版本不支持 itemName，忽略
+                // 鏃х増鏈笉鏀寔 itemName锛屽拷鐣?
             }
         }
-        // 使用物品类型的翻译键
+        // 浣跨敤鐗╁搧绫诲瀷鐨勭炕璇戦敭
         return Component.translatable(item.getType().translationKey());
     }
 
     /**
-     * 格式化材质名称
+     * 鏍煎紡鍖栨潗璐ㄥ悕绉?
      */
     private String formatMaterialName(Material material) {
         String name = material.name().toLowerCase().replace("_", " ");
@@ -427,7 +475,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取物品Lore
+     * 鑾峰彇鐗╁搧Lore
      */
     private String getItemLore(ItemStack item) {
         if (!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
@@ -452,7 +500,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取物品附魔（返回组件以支持本地化）
+     * 鑾峰彇鐗╁搧闄勯瓟锛堣繑鍥炵粍浠朵互鏀寔鏈湴鍖栵級
      */
     private Component getItemEnchantmentsComponent(ItemStack item) {
         Map<Enchantment, Integer> enchants = item.getEnchantments();
@@ -463,7 +511,7 @@ public class ItemDisplayManager {
         Component result = Component.empty();
         int i = 0;
         for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
-            // 使用附魔的翻译键
+            // 浣跨敤闄勯瓟鐨勭炕璇戦敭
             Component enchantName = Component.translatable(entry.getKey().translationKey());
             Component line = Component.text("", net.kyori.adventure.text.format.NamedTextColor.AQUA)
                     .append(enchantName)
@@ -479,7 +527,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取物品附魔（字符串形式，用于不支持组件的地方）
+     * 鑾峰彇鐗╁搧闄勯瓟锛堝瓧绗︿覆褰㈠紡锛岀敤浜庝笉鏀寔缁勪欢鐨勫湴鏂癸級
      */
     private String getItemEnchantments(ItemStack item) {
         Map<Enchantment, Integer> enchants = item.getEnchantments();
@@ -501,11 +549,11 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 格式化附魔名称
+     * 鏍煎紡鍖栭檮榄斿悕绉?
      */
     private String formatEnchantmentName(Enchantment enchantment) {
         String key = enchantment.getKey().getKey();
-        // 将下划线分隔的名称转换为首字母大写的格式
+        // 灏嗕笅鍒掔嚎鍒嗛殧鐨勫悕绉拌浆鎹负棣栧瓧姣嶅ぇ鍐欑殑鏍煎紡
         String name = key.toLowerCase().replace("_", " ");
         StringBuilder result = new StringBuilder();
         boolean capitalizeNext = true;
@@ -524,12 +572,30 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 创建背包快照
+     * 鍒涘缓鑳屽寘蹇収
      */
+    /**
+     * 创建手持物品快照
+     */
+    private UUID createHandItemSnapshot(Player player, ItemStack item) {
+        UUID id = UUID.randomUUID();
+        ItemStack[] contents = new ItemStack[]{item.clone()};
+
+        ItemSnapshot snapshot = new ItemSnapshot(
+                id,
+                player.getUniqueId(),
+                player.getName(),
+                ItemSnapshot.Type.HAND_ITEM,
+                contents,
+                System.currentTimeMillis() + snapshotExpireTime * 1000L
+        );
+        snapshots.put(id, snapshot);
+        return id;
+    }
     private UUID createInventorySnapshot(Player player) {
         UUID id = UUID.randomUUID();
         ItemStack[] contents = player.getInventory().getContents().clone();
-        // 深拷贝
+        // 娣辨嫹璐?
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 contents[i] = contents[i].clone();
@@ -549,12 +615,12 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 创建末影箱快照
+     * 鍒涘缓鏈奖绠卞揩鐓?
      */
     private UUID createEnderchestSnapshot(Player player) {
         UUID id = UUID.randomUUID();
         ItemStack[] contents = player.getEnderChest().getContents().clone();
-        // 深拷贝
+        // 娣辨嫹璐?
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null) {
                 contents[i] = contents[i].clone();
@@ -574,7 +640,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取快照
+     * 鑾峰彇蹇収
      */
     public ItemSnapshot getSnapshot(UUID id) {
         ItemSnapshot snapshot = snapshots.get(id);
@@ -586,7 +652,7 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 打开快照GUI
+     * 鎵撳紑蹇収GUI
      */
     public void openSnapshotGui(Player viewer, UUID snapshotId) {
         ItemSnapshot snapshot = getSnapshot(snapshotId);
@@ -595,25 +661,24 @@ public class ItemDisplayManager {
             return;
         }
 
-        // 检查权限
-        String viewPermission = snapshot.type() == ItemSnapshot.Type.INVENTORY ?
-                inventoryViewPermission : enderchestViewPermission;
-        if (!viewer.hasPermission(viewPermission)) {
-            plugin.getMessageManager().send(viewer, "item-display.view-no-permission");
-            return;
-        }
-
-        // 使用GUI管理器打开
-        if (snapshot.type() == ItemSnapshot.Type.INVENTORY) {
-            guiManager.openInventoryGui(viewer, snapshot);
-        } else {
-            guiManager.openEnderchestGui(viewer, snapshot);
+        switch (snapshot.type()) {
+            case HAND_ITEM -> guiManager.openHandItemGui(viewer, snapshot);
+            case INVENTORY -> {
+                if (!viewer.hasPermission(inventoryViewPermission)) {
+                    plugin.getMessageManager().send(viewer, "item-display.view-no-permission");
+                    return;
+                }
+                guiManager.openInventoryGui(viewer, snapshot);
+            }
+            case ENDERCHEST -> {
+                if (!viewer.hasPermission(enderchestViewPermission)) {
+                    plugin.getMessageManager().send(viewer, "item-display.view-no-permission");
+                    return;
+                }
+                guiManager.openEnderchestGui(viewer, snapshot);
+            }
         }
     }
-
-    /**
-     * 统计物品数量
-     */
     private int countItems(ItemStack[] contents) {
         int count = 0;
         for (ItemStack item : contents) {
@@ -625,17 +690,17 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 启动清理任务
+     * 鍚姩娓呯悊浠诲姟
      */
     private void startCleanupTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             long now = System.currentTimeMillis();
             snapshots.entrySet().removeIf(entry -> entry.getValue().expireTime() < now);
-        }, 6000L, 6000L); // 每5分钟清理一次
+        }, 6000L, 6000L); // 姣?鍒嗛挓娓呯悊涓€娆?
     }
 
     /**
-     * 检查消息是否包含物品展示占位符
+     * 妫€鏌ユ秷鎭槸鍚﹀寘鍚墿鍝佸睍绀哄崰浣嶇
      */
     public boolean containsPlaceholder(String message) {
         if (message == null) return false;
@@ -654,8 +719,8 @@ public class ItemDisplayManager {
     public String getEnderchestPlaceholder() { return enderchestPlaceholder; }
 
     /**
-     * 处理消息中的物品展示占位符（跨服版本，转为纯文本）
-     * 用于跨服消息传输，将物品展示转为物品名称文本
+     * 澶勭悊娑堟伅涓殑鐗╁搧灞曠ず鍗犱綅绗︼紙璺ㄦ湇鐗堟湰锛岃浆涓虹函鏂囨湰锛?
+     * 鐢ㄤ簬璺ㄦ湇娑堟伅浼犺緭锛屽皢鐗╁搧灞曠ず杞负鐗╁搧鍚嶇О鏂囨湰
      */
     public String processMessageForCrossServer(Player player, String message) {
         if (message == null || message.isEmpty()) {
@@ -664,19 +729,19 @@ public class ItemDisplayManager {
 
         String result = message;
 
-        // 处理手持物品占位符
+        // 澶勭悊鎵嬫寔鐗╁搧鍗犱綅绗?
         if (handItemEnabled && handItemPlaceholder != null && result.contains(handItemPlaceholder)) {
             String replacement = getHandItemTextForCrossServer(player);
             result = result.replace(handItemPlaceholder, replacement);
         }
 
-        // 处理背包占位符
+        // 澶勭悊鑳屽寘鍗犱綅绗?
         if (inventoryEnabled && inventoryPlaceholder != null && result.contains(inventoryPlaceholder)) {
             String replacement = getInventoryTextForCrossServer(player);
             result = result.replace(inventoryPlaceholder, replacement);
         }
 
-        // 处理末影箱占位符
+        // 澶勭悊鏈奖绠卞崰浣嶇
         if (enderchestEnabled && enderchestPlaceholder != null && result.contains(enderchestPlaceholder)) {
             String replacement = getEnderchestTextForCrossServer(player);
             result = result.replace(enderchestPlaceholder, replacement);
@@ -686,49 +751,64 @@ public class ItemDisplayManager {
     }
 
     /**
-     * 获取手持物品的跨服文本表示
+     * 鑾峰彇鎵嬫寔鐗╁搧鐨勮法鏈嶆枃鏈〃绀?
      */
     private String getHandItemTextForCrossServer(Player player) {
         if (!player.hasPermission(handItemPermission)) {
             return PlainTextComponentSerializer.plainText().serialize(miniMessage.deserialize(handItemEmptyHand));
         }
 
-        org.bukkit.inventory.ItemStack item = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         if (item.getType() == Material.AIR) {
             return PlainTextComponentSerializer.plainText().serialize(miniMessage.deserialize(handItemEmptyHand));
         }
 
-        // 获取物品显示名称
+        if (handItemDisplayMode == HandItemDisplayMode.GUI) {
+            return buildHandItemDisplayText(item);
+        }
+
         String itemName = getItemDisplayName(item);
         int amount = item.getAmount();
 
-        // 格式: [物品名称 x数量] 或 [物品名称]
         if (amount > 1) {
             return "<!i><aqua>[" + itemName + " x" + amount + "]</aqua>";
         } else {
             return "<!i><aqua>[" + itemName + "]</aqua>";
         }
     }
-
-    /**
-     * 获取背包的跨服文本表示
-     */
     private String getInventoryTextForCrossServer(Player player) {
         if (!player.hasPermission(inventoryPermission)) {
             return "";
         }
-        // 返回格式化文本（不带点击事件）
+        // 杩斿洖鏍煎紡鍖栨枃鏈紙涓嶅甫鐐瑰嚮浜嬩欢锛?
         return inventoryFormat;
     }
 
     /**
-     * 获取末影箱的跨服文本表示
+     * 鑾峰彇鏈奖绠辩殑璺ㄦ湇鏂囨湰琛ㄧず
      */
     private String getEnderchestTextForCrossServer(Player player) {
         if (!player.hasPermission(enderchestPermission)) {
             return "";
         }
-        // 返回格式化文本（不带点击事件）
+        // 杩斿洖鏍煎紡鍖栨枃鏈紙涓嶅甫鐐瑰嚮浜嬩欢锛?
         return enderchestFormat;
+    }
+
+    private enum HandItemDisplayMode {
+        NATIVE,
+        GUI;
+
+        private static HandItemDisplayMode fromId(String id) {
+            if (id == null) {
+                return NATIVE;
+            }
+            for (HandItemDisplayMode mode : values()) {
+                if (mode.name().equalsIgnoreCase(id)) {
+                    return mode;
+                }
+            }
+            return NATIVE;
+        }
     }
 }

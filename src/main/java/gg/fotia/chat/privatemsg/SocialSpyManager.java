@@ -76,6 +76,20 @@ public class SocialSpyManager {
         }
     }
 
+    public void notifyVirtualSpy(String senderName, String targetName, String message) {
+        String spyFormat = plugin.getMessageManager().getRaw("privatemsg.socialspy-format");
+        spyFormat = spyFormat.replace("{sender}", senderName);
+        spyFormat = spyFormat.replace("{target}", targetName);
+        spyFormat = spyFormat.replace("{message}", message);
+
+        for (UUID uuid : spyingPlayers) {
+            Player spy = Bukkit.getPlayer(uuid);
+            if (spy != null && spy.isOnline()) {
+                spy.sendMessage(MessageUtil.parse(spyFormat, spy));
+            }
+        }
+    }
+
     /**
      * 清除玩家的监听状态
      */

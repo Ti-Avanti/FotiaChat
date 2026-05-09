@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,37 +50,23 @@ public class MsgCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        String targetName = args[0];
-        Player target = Bukkit.getPlayer(targetName);
-
-        if (target == null || !target.isOnline()) {
-            plugin.getMessageManager().send(player, "general.player-offline",
-                    Map.of("player", targetName));
-            return true;
-        }
-
-        // 拼接消息
-        StringBuilder messageBuilder = new StringBuilder();
-        for (int i = 1; i < args.length; i++) {
-            if (i > 1) messageBuilder.append(" ");
-            messageBuilder.append(args[i]);
-        }
-        String message = messageBuilder.toString();
-
-        privateMessageManager.sendMessage(player, target, message);
+        privateMessageManager.sendMessage(player, args);
         return true;
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
-                                                 @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1) {
-            String input = args[0].toLowerCase();
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(Player::getName)
-                    .filter(name -> name.toLowerCase().startsWith(input))
-                    .collect(Collectors.toList());
+                                                @NotNull String label, @NotNull String[] args) {
+        if (args.length != 1) {
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
+
+        String input = args[0].toLowerCase();
+        LinkedHashSet<String> suggestions = new LinkedHashSet<>(Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(name -> name.toLowerCase().startsWith(input))
+                .collect(Collectors.toList()));
+        suggestions.addAll(privateMessageManager.suggestVirtualTargetNames(args[0]));
+        return new ArrayList<>(suggestions);
     }
 }

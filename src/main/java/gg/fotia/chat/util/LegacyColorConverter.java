@@ -23,22 +23,22 @@ public class LegacyColorConverter {
 
     static {
         // 基础颜色
-        COLOR_MAP.put('0', "<black>");
-        COLOR_MAP.put('1', "<dark_blue>");
-        COLOR_MAP.put('2', "<dark_green>");
-        COLOR_MAP.put('3', "<dark_aqua>");
-        COLOR_MAP.put('4', "<dark_red>");
-        COLOR_MAP.put('5', "<dark_purple>");
-        COLOR_MAP.put('6', "<gold>");
-        COLOR_MAP.put('7', "<gray>");
-        COLOR_MAP.put('8', "<dark_gray>");
-        COLOR_MAP.put('9', "<blue>");
-        COLOR_MAP.put('a', "<green>");
-        COLOR_MAP.put('b', "<aqua>");
-        COLOR_MAP.put('c', "<red>");
-        COLOR_MAP.put('d', "<light_purple>");
-        COLOR_MAP.put('e', "<yellow>");
-        COLOR_MAP.put('f', "<white>");
+        COLOR_MAP.put('0', "<reset><black>");
+        COLOR_MAP.put('1', "<reset><dark_blue>");
+        COLOR_MAP.put('2', "<reset><dark_green>");
+        COLOR_MAP.put('3', "<reset><dark_aqua>");
+        COLOR_MAP.put('4', "<reset><dark_red>");
+        COLOR_MAP.put('5', "<reset><dark_purple>");
+        COLOR_MAP.put('6', "<reset><gold>");
+        COLOR_MAP.put('7', "<reset><gray>");
+        COLOR_MAP.put('8', "<reset><dark_gray>");
+        COLOR_MAP.put('9', "<reset><blue>");
+        COLOR_MAP.put('a', "<reset><green>");
+        COLOR_MAP.put('b', "<reset><aqua>");
+        COLOR_MAP.put('c', "<reset><red>");
+        COLOR_MAP.put('d', "<reset><light_purple>");
+        COLOR_MAP.put('e', "<reset><yellow>");
+        COLOR_MAP.put('f', "<reset><white>");
 
         // 格式代码
         FORMAT_MAP.put('k', "<obfuscated>");
@@ -81,7 +81,7 @@ public class LegacyColorConverter {
 
         while (matcher.find()) {
             String hex = matcher.group(1).toLowerCase();
-            matcher.appendReplacement(result, "<#" + hex + ">");
+            matcher.appendReplacement(result, "<reset><#" + hex + ">");
         }
         matcher.appendTail(result);
 
@@ -105,7 +105,7 @@ public class LegacyColorConverter {
                     hex.append(c);
                 }
             }
-            matcher.appendReplacement(result, "<#" + hex.toString().toLowerCase() + ">");
+            matcher.appendReplacement(result, "<reset><#" + hex.toString().toLowerCase() + ">");
         }
         matcher.appendTail(result);
 

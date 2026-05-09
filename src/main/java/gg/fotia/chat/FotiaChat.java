@@ -3,6 +3,8 @@ package gg.fotia.chat;
 import gg.fotia.chat.announcement.AnnouncementManager;
 import gg.fotia.chat.api.AddonManager;
 import gg.fotia.chat.api.FotiaChatAPI;
+import gg.fotia.chat.api.PublicChatObserver;
+import gg.fotia.chat.api.VirtualChatDispatcher;
 import gg.fotia.chat.channel.ChannelManager;
 import gg.fotia.chat.color.ColorManager;
 import gg.fotia.chat.command.*;
@@ -22,6 +24,9 @@ import gg.fotia.chat.privatemsg.PrivateMessageManager;
 import gg.fotia.chat.storage.DatabaseManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 public class FotiaChat extends JavaPlugin {
 
     private static FotiaChat instance;
@@ -40,6 +45,8 @@ public class FotiaChat extends JavaPlugin {
     private DatabaseManager databaseManager;
     private ItemDisplayManager itemDisplayManager;
     private IgnoreManager ignoreManager;
+    private VirtualChatDispatcher virtualChatDispatcher;
+    private final List<PublicChatObserver> publicChatObservers = new CopyOnWriteArrayList<>();
 
     @Override
     public void onEnable() {
@@ -79,6 +86,7 @@ public class FotiaChat extends JavaPlugin {
         // 初始化屏蔽管理器
         this.ignoreManager = new IgnoreManager(this);
         this.ignoreManager.load();
+        this.virtualChatDispatcher = new VirtualChatDispatcher(this);
 
         // 初始化私聊管理器
         this.privateMessageManager = new PrivateMessageManager(this);
@@ -254,6 +262,33 @@ public class FotiaChat extends JavaPlugin {
 
     public IgnoreManager getIgnoreManager() {
         return ignoreManager;
+    }
+
+    public VirtualChatDispatcher getVirtualChatDispatcher() {
+        return virtualChatDispatcher;
+    }
+
+    public void registerPublicChatObserver(PublicChatObserver observer) {
+        if (observer != null) {
+            publicChatObservers.add(observer);
+        }
+    }
+
+    public void unregisterPublicChatObserver(PublicChatObserver observer) {
+        publicChatObservers.remove(observer);
+    }
+
+    public void notifyPublicChatObservers(org.bukkit.entity.Player sender,
+                                          gg.fotia.chat.channel.Channel channel,
+                                          String plainMessage,
+                                          net.kyori.adventure.text.Component formattedMessage) {
+        for (PublicChatObserver observer : publicChatObservers) {
+            try {
+                observer.onPublicChat(sender, channel, plainMessage, formattedMessage);
+            } catch (Exception exception) {
+                getLogger().warning("通知公聊观察者失败: " + exception.getMessage());
+            }
+        }
     }
 
     public void reload() {

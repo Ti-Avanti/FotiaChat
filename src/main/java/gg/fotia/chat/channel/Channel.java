@@ -2,7 +2,10 @@ package gg.fotia.chat.channel;
 
 import net.kyori.adventure.text.event.ClickEvent;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 频道数据类
@@ -18,19 +21,19 @@ public class Channel {
     private final int radius;
     private final boolean isDefault;
 
-    // Hover配置
     private final boolean hoverEnabled;
     private final List<String> hoverText;
 
-    // Click配置
     private final boolean clickEnabled;
     private final ClickEvent.Action clickAction;
     private final String clickValue;
+    private final Map<String, ChannelSegmentConfig> segmentConfigs;
 
     public Channel(String id, String name, ChannelType type, String format,
                    String permission, String shortcut, int radius, boolean isDefault,
                    boolean hoverEnabled, List<String> hoverText,
-                   boolean clickEnabled, ClickEvent.Action clickAction, String clickValue) {
+                   boolean clickEnabled, ClickEvent.Action clickAction, String clickValue,
+                   Map<String, ChannelSegmentConfig> segmentConfigs) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -40,17 +43,17 @@ public class Channel {
         this.radius = radius;
         this.isDefault = isDefault;
         this.hoverEnabled = hoverEnabled;
-        this.hoverText = hoverText;
+        this.hoverText = hoverText == null ? List.of() : List.copyOf(hoverText);
         this.clickEnabled = clickEnabled;
-        this.clickAction = clickAction;
-        this.clickValue = clickValue;
+        this.clickAction = clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction;
+        this.clickValue = clickValue == null ? "" : clickValue;
+        this.segmentConfigs = normalizeSegmentConfigs(segmentConfigs);
     }
 
-    // 兼容旧构造函数
     public Channel(String id, String name, ChannelType type, String format,
                    String permission, String shortcut, int radius, boolean isDefault) {
         this(id, name, type, format, permission, shortcut, radius, isDefault,
-                false, List.of(), false, ClickEvent.Action.SUGGEST_COMMAND, "");
+                false, List.of(), false, ClickEvent.Action.SUGGEST_COMMAND, "", Map.of());
     }
 
     public String getId() {
@@ -105,10 +108,37 @@ public class Channel {
         return clickValue;
     }
 
-    /**
-     * 检查是否为范围频道
-     */
+    public Map<String, ChannelSegmentConfig> getSegmentConfigs() {
+        return segmentConfigs;
+    }
+
+    public ChannelSegmentConfig getSegmentConfig(String id) {
+        if (id == null) {
+            return null;
+        }
+        return segmentConfigs.get(id.toLowerCase());
+    }
+
+    public boolean hasSegmentConfigs() {
+        return !segmentConfigs.isEmpty();
+    }
+
     public boolean isLocalChannel() {
         return type == ChannelType.LOCAL && radius > 0;
+    }
+
+    private Map<String, ChannelSegmentConfig> normalizeSegmentConfigs(Map<String, ChannelSegmentConfig> source) {
+        if (source == null || source.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, ChannelSegmentConfig> normalized = new LinkedHashMap<>();
+        for (Map.Entry<String, ChannelSegmentConfig> entry : source.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) {
+                continue;
+            }
+            normalized.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+        return Collections.unmodifiableMap(normalized);
     }
 }

@@ -12,8 +12,10 @@ import gg.fotia.chat.manager.MessageManager;
 import gg.fotia.chat.menu.MenuManager;
 import gg.fotia.chat.mute.MuteManager;
 import gg.fotia.chat.privatemsg.PrivateMessageManager;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import net.kyori.adventure.text.Component;
+
+import java.util.UUID;
 
 /**
  * FotiaChat API
@@ -66,6 +68,13 @@ public class FotiaChatAPI {
     }
 
     /**
+     * 获取虚拟发言者聊天分发器。
+     */
+    public static VirtualChatDispatcher getVirtualChatDispatcher() {
+        return plugin.getVirtualChatDispatcher();
+    }
+
+    /**
      * 获取颜色管理器
      */
     public static ColorManager getColorManager() {
@@ -114,6 +123,20 @@ public class FotiaChatAPI {
         return plugin.getAddonManager();
     }
 
+    /**
+     * 注册公共聊天观察者。
+     */
+    public static void registerPublicChatObserver(PublicChatObserver observer) {
+        plugin.registerPublicChatObserver(observer);
+    }
+
+    /**
+     * 注销公共聊天观察者。
+     */
+    public static void unregisterPublicChatObserver(PublicChatObserver observer) {
+        plugin.unregisterPublicChatObserver(observer);
+    }
+
     // ==================== 便捷方法 ====================
 
     /**
@@ -138,6 +161,27 @@ public class FotiaChatAPI {
     }
 
     /**
+     * 格式化虚拟发言者聊天消息。
+     */
+    public static Component formatVirtualMessage(VirtualChatSender sender, Channel channel, String message) {
+        return plugin.getChatFormatter().format(sender, channel, message);
+    }
+
+    /**
+     * 将虚拟发言者聊天消息按 FotiaChat 规则分发。
+     */
+    public static boolean dispatchVirtualChat(VirtualChatSender sender, String channelId, String message) {
+        return plugin.getVirtualChatDispatcher().dispatchPublicChat(sender, channelId, message);
+    }
+
+    /**
+     * 将虚拟发言者聊天消息发送到默认频道。
+     */
+    public static boolean dispatchVirtualChat(VirtualChatSender sender, String message) {
+        return plugin.getVirtualChatDispatcher().dispatchPublicChat(sender, message);
+    }
+
+    /**
      * 发送跨服消息
      */
     public static void sendCrossServerMessage(Player player, Channel channel, String message) {
@@ -153,6 +197,37 @@ public class FotiaChatAPI {
         if (plugin.getCrossServerManager().isEnabled()) {
             plugin.getCrossServerManager().sendBroadcast(message);
         }
+    }
+
+    /**
+     * 注册虚拟私聊目标提供者。
+     */
+    public static void registerVirtualPrivateMessageProvider(VirtualPrivateMessageProvider provider) {
+        plugin.getPrivateMessageManager().registerVirtualProvider(provider);
+    }
+
+    /**
+     * 注销虚拟私聊目标提供者。
+     */
+    public static void unregisterVirtualPrivateMessageProvider(VirtualPrivateMessageProvider provider) {
+        plugin.getPrivateMessageManager().unregisterVirtualProvider(provider);
+    }
+
+    /**
+     * 由虚拟目标向真人玩家发送私聊。
+     */
+    public static boolean sendVirtualPrivateMessageToPlayer(String senderName,
+                                                            String senderDisplayName,
+                                                            UUID senderUuid,
+                                                            Player target,
+                                                            String message) {
+        return plugin.getPrivateMessageManager().sendVirtualMessageToPlayer(
+                senderName,
+                senderDisplayName,
+                senderUuid,
+                target,
+                message
+        );
     }
 
     /**

@@ -2,6 +2,7 @@ package gg.fotia.chat.itemdisplay;
 
 import gg.fotia.chat.FotiaChat;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -11,23 +12,24 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-/**
- * 物品展示GUI管理器
- */
 public class ItemDisplayGuiManager {
 
     private final FotiaChat plugin;
     private final MiniMessage miniMessage;
     private FileConfiguration config;
 
-    // 背包GUI配置
+    private String handTitle;
+    private List<String> handLayout;
+    private ConfigurationSection handIcons;
+
     private String invTitle;
     private List<String> invLayout;
     private ConfigurationSection invIcons;
 
-    // 末影箱GUI配置
     private String ecTitle;
     private List<String> ecLayout;
     private ConfigurationSection ecIcons;
@@ -37,68 +39,70 @@ public class ItemDisplayGuiManager {
         this.miniMessage = MiniMessage.miniMessage();
     }
 
-    /**
-     * 加载配置
-     */
     public void load(FileConfiguration config) {
         this.config = config;
 
-        // 加载背包GUI配置
+        handTitle = config.getString("hand-item.gui.Title", "<!i><aqua>{player}'s Item</aqua>");
+        handLayout = config.getStringList("hand-item.gui.Layout");
+        if (handLayout == null || handLayout.isEmpty()) {
+            handLayout = List.of("#########", "####i####", "#########");
+        }
+        handIcons = config.getConfigurationSection("hand-item.gui.Icons");
+
         ConfigurationSection invSection = config.getConfigurationSection("inventory.gui");
         if (invSection != null) {
-            invTitle = invSection.getString("Title", "<!i><gold>{player} 的背包</gold>");
+            invTitle = invSection.getString("Title", "<!i><gold>{player} Inventory</gold>");
             invLayout = invSection.getStringList("Layout");
             invIcons = invSection.getConfigurationSection("Icons");
         }
 
-        // 加载末影箱GUI配置
         ConfigurationSection ecSection = config.getConfigurationSection("enderchest.gui");
         if (ecSection != null) {
-            ecTitle = ecSection.getString("Title", "<!i><dark_purple>{player} 的末影箱</dark_purple>");
+            ecTitle = ecSection.getString("Title", "<!i><dark_purple>{player} Ender Chest</dark_purple>");
             ecLayout = ecSection.getStringList("Layout");
             ecIcons = ecSection.getConfigurationSection("Icons");
         }
     }
 
-    /**
-     * 打开背包展示GUI
-     */
+    public void openHandItemGui(Player viewer, ItemSnapshot snapshot) {
+        String title = resolveTitle(handTitle, snapshot);
+        int size = Math.max(9, handLayout.size() * 9);
+        Inventory gui = Bukkit.createInventory(new ItemDisplayHolder(snapshot.id()), size,
+                miniMessage.deserialize(title));
+
+        fillInventoryFromLayout(gui, handLayout, handIcons, snapshot.contents());
+        viewer.openInventory(gui);
+    }
+
     public void openInventoryGui(Player viewer, ItemSnapshot snapshot) {
-        String title = invTitle.replace("{player}", snapshot.playerName());
+        String title = resolveTitle(invTitle, snapshot);
         int size = invLayout.size() * 9;
         Inventory gui = Bukkit.createInventory(new ItemDisplayHolder(snapshot.id()), size,
                 miniMessage.deserialize(title));
 
-        // 解析布局并填充
-        fillInventoryFromLayout(gui, invLayout, invIcons, snapshot.contents(), "inventory");
-
+        fillInventoryFromLayout(gui, invLayout, invIcons, snapshot.contents());
         viewer.openInventory(gui);
     }
 
-    /**
-     * 打开末影箱展示GUI
-     */
     public void openEnderchestGui(Player viewer, ItemSnapshot snapshot) {
-        String title = ecTitle.replace("{player}", snapshot.playerName());
+        String title = resolveTitle(ecTitle, snapshot);
         int size = ecLayout.size() * 9;
         Inventory gui = Bukkit.createInventory(new ItemDisplayHolder(snapshot.id()), size,
                 miniMessage.deserialize(title));
 
-        // 解析布局并填充
-        fillInventoryFromLayout(gui, ecLayout, ecIcons, snapshot.contents(), "enderchest");
-
+        fillInventoryFromLayout(gui, ecLayout, ecIcons, snapshot.contents());
         viewer.openInventory(gui);
     }
 
-    /**
-     * 根据布局填充GUI
-     */
     private void fillInventoryFromLayout(Inventory gui, List<String> layout, ConfigurationSection icons,
-                                         ItemStack[] contents, String type) {
-        // 动态槽位计数器
-        int inventoryIndex = 9;  // 主背包从槽位9开始
-        int hotbarIndex = 0;     // 快捷栏从槽位0开始
-        int enderchestIndex = 0; // 末影箱从槽位0开始
+                                         ItemStack[] contents) {
+        if (layout == null || layout.isEmpty() || icons == null) {
+            return;
+        }
+
+        int inventoryIndex = 9;
+        int hotbarIndex = 0;
+        int enderchestIndex = 0;
 
         for (int row = 0; row < layout.size(); row++) {
             String rowLayout = layout.get(row);
@@ -107,19 +111,19 @@ public class ItemDisplayGuiManager {
                 char iconChar = rowLayout.charAt(col);
                 String iconKey = String.valueOf(iconChar);
 
-                if (icons == null) continue;
                 ConfigurationSection iconSection = icons.getConfigurationSection(iconKey);
-                if (iconSection == null) continue;
+                if (iconSection == null) {
+                    continue;
+                }
 
                 String iconType = iconSection.getString("type", "");
-
-                // 处理动态槽位类型
                 ItemStack item = switch (iconType) {
                     case "armor_helmet" -> getArmorItem(contents, 39, iconSection);
                     case "armor_chestplate" -> getArmorItem(contents, 38, iconSection);
                     case "armor_leggings" -> getArmorItem(contents, 37, iconSection);
                     case "armor_boots" -> getArmorItem(contents, 36, iconSection);
                     case "offhand" -> getArmorItem(contents, 40, iconSection);
+                    case "hand_item" -> getSingleItem(contents, iconSection);
                     case "inventory" -> {
                         if (inventoryIndex < 36 && inventoryIndex < contents.length) {
                             ItemStack invItem = contents[inventoryIndex++];
@@ -151,14 +155,10 @@ public class ItemDisplayGuiManager {
         }
     }
 
-    /**
-     * 获取盔甲/副手物品
-     */
     private ItemStack getArmorItem(ItemStack[] contents, int armorSlot, ConfigurationSection iconSection) {
         if (armorSlot < contents.length && contents[armorSlot] != null) {
             return contents[armorSlot].clone();
         }
-        // 返回空槽位显示
         ConfigurationSection emptySection = iconSection.getConfigurationSection("empty");
         if (emptySection != null) {
             return createItemFromSection(emptySection);
@@ -166,9 +166,17 @@ public class ItemDisplayGuiManager {
         return null;
     }
 
-    /**
-     * 创建静态物品
-     */
+    private ItemStack getSingleItem(ItemStack[] contents, ConfigurationSection iconSection) {
+        if (contents.length > 0 && contents[0] != null) {
+            return contents[0].clone();
+        }
+        ConfigurationSection emptySection = iconSection.getConfigurationSection("empty");
+        if (emptySection != null) {
+            return createItemFromSection(emptySection);
+        }
+        return null;
+    }
+
     private ItemStack createStaticItem(ConfigurationSection iconSection) {
         ConfigurationSection displaySection = iconSection.getConfigurationSection("display");
         if (displaySection != null) {
@@ -177,9 +185,6 @@ public class ItemDisplayGuiManager {
         return null;
     }
 
-    /**
-     * 从配置节创建物品
-     */
     private ItemStack createItemFromSection(ConfigurationSection section) {
         String materialStr = section.getString("material", "STONE");
         Material material = Material.matchMaterial(materialStr);
@@ -210,9 +215,41 @@ public class ItemDisplayGuiManager {
         return item;
     }
 
-    /**
-     * 物品展示GUI持有者
-     */
+    private String resolveTitle(String titleTemplate, ItemSnapshot snapshot) {
+        String safeTitle = titleTemplate == null ? "<!i><gray>Item Preview</gray>" : titleTemplate;
+        ItemStack displayItem = snapshot.contents().length > 0 ? snapshot.contents()[0] : null;
+        return safeTitle.replace("{player}", snapshot.playerName())
+                .replace("{item_name}", getItemName(displayItem))
+                .replace("{amount}", displayItem == null ? "0" : String.valueOf(displayItem.getAmount()));
+    }
+
+    private String getItemName(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) {
+            return "Empty Item";
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null && meta.hasDisplayName() && meta.displayName() != null) {
+            return PlainTextComponentSerializer.plainText().serialize(meta.displayName());
+        }
+
+        String name = item.getType().name().toLowerCase().replace("_", " ");
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+        for (char c : name.toCharArray()) {
+            if (c == ' ') {
+                capitalizeNext = true;
+                result.append(c);
+            } else if (capitalizeNext) {
+                result.append(Character.toUpperCase(c));
+                capitalizeNext = false;
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
     public static class ItemDisplayHolder implements org.bukkit.inventory.InventoryHolder {
         private final UUID snapshotId;
 
