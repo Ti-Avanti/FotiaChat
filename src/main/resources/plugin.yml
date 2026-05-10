@@ -115,6 +115,9 @@ permissions:
   fotiachat.admin.reload:
     description: 允许重载配置
     default: op
+  fotiachat.update.notify:
+    description: 允许接收更新检测提示
+    default: op
   fotiachat.command.announcement:
     description: 允许使用公告命令
     default: op

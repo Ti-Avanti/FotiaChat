@@ -71,6 +71,15 @@ crossserver:
   chat-format: "<!i><dark_gray>[{server}]</dark_gray> <gray>[{channel}]</gray> <white>{player}</white><gray>:</gray> {message}"
   broadcast-format: "<!i><dark_gray>[{server}]</dark_gray> <gold>{message}</gold>"
 
+# Update check messages
+update:
+  available: "<!i><gold>A new FotiaChat version is available: <white>{latest}</white> <gray>(current: {current})</gray>"
+  release-url: "<!i><gray>Click to view the release page: <aqua>{url}</aqua>"
+  release-hover: "<!i><yellow>Click to open the GitHub Release page"
+  console-available: "A new FotiaChat version is available: {latest} (current: {current}) - {url}"
+  console-latest: "FotiaChat is up to date: {current}"
+  console-failed: "FotiaChat update check failed: {reason}"
+
 # Announcement related messages
 announcement:
   sent: "<!i><green>Announcement sent: {id}"

@@ -22,6 +22,7 @@ import gg.fotia.chat.menu.MenuManager;
 import gg.fotia.chat.mute.MuteManager;
 import gg.fotia.chat.privatemsg.PrivateMessageManager;
 import gg.fotia.chat.storage.DatabaseManager;
+import gg.fotia.chat.update.UpdateChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class FotiaChat extends JavaPlugin {
     private ItemDisplayManager itemDisplayManager;
     private IgnoreManager ignoreManager;
     private VirtualChatDispatcher virtualChatDispatcher;
+    private UpdateChecker updateChecker;
     private final List<PublicChatObserver> publicChatObservers = new CopyOnWriteArrayList<>();
 
     @Override
@@ -110,6 +112,9 @@ public class FotiaChat extends JavaPlugin {
         // 初始化API
         FotiaChatAPI.init(this);
 
+        // 初始化更新检测器
+        this.updateChecker = new UpdateChecker(this);
+
         // 注册监听器
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -171,6 +176,8 @@ public class FotiaChat extends JavaPlugin {
         // 初始化Addon管理器（在命令注册之后，这样Addon可以覆盖占位命令）
         this.addonManager = new AddonManager(this);
         this.addonManager.loadAddons();
+
+        updateChecker.checkOnStartup();
 
         getLogger().info("FotiaChat 已启用!");
     }
@@ -266,6 +273,10 @@ public class FotiaChat extends JavaPlugin {
 
     public VirtualChatDispatcher getVirtualChatDispatcher() {
         return virtualChatDispatcher;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 
     public void registerPublicChatObserver(PublicChatObserver observer) {

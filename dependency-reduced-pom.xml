@@ -4,7 +4,7 @@
   <groupId>gg.fotia</groupId>
   <artifactId>FotiaChat</artifactId>
   <name>FotiaChat</name>
-  <version>1.0.7</version>
+  <version>1.0.9</version>
   <description>高级聊天管理插件</description>
   <build>
     <resources>

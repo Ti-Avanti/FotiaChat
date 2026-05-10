@@ -22,6 +22,11 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline() && plugin.getUpdateChecker() != null) {
+                plugin.getUpdateChecker().notifyPlayerIfUpdateAvailable(player);
+            }
+        }, 40L);
 
         // 从数据库加载玩家数据
         DatabaseManager dbManager = plugin.getDatabaseManager();

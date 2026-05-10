@@ -71,6 +71,15 @@ crossserver:
   chat-format: "<!i><dark_gray>[{server}]</dark_gray> <gray>[{channel}]</gray> <white>{player}</white><gray>:</gray> {message}"
   broadcast-format: "<!i><dark_gray>[{server}]</dark_gray> <gold>{message}</gold>"
 
+# 更新检测相关消息
+update:
+  available: "<!i><gold>FotiaChat 有新版本可用: <white>{latest}</white> <gray>(当前: {current})</gray>"
+  release-url: "<!i><gray>点击查看发布页: <aqua>{url}</aqua>"
+  release-hover: "<!i><yellow>点击打开 GitHub Release 页面"
+  console-available: "FotiaChat 有新版本可用: {latest} (当前: {current}) - {url}"
+  console-latest: "FotiaChat 当前已是最新版本: {current}"
+  console-failed: "FotiaChat 更新检测失败: {reason}"
+
 # 公告相关消息
 announcement:
   sent: "<!i><green>已发送公告: {id}"
