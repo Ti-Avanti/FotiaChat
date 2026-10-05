@@ -189,13 +189,15 @@ public class ChatListener implements Listener {
         localizedMessages.put(plugin.getMessageManager().getLocale(null), defaultFormattedMessage);
         for (Player recipient : recipients) {
             if (channelManager.hasChannelPermission(recipient, finalChannel)
+                    && gg.fotia.chat.api.PlayerPreferences.allows(recipient, "fotiachat", "chat.public", player.getUniqueId())
                     && !ignoreManager.isIgnoring(recipient.getUniqueId(), player.getUniqueId())) {
                 String locale = plugin.getMessageManager().getLocale(recipient);
                 Component localizedMessage = localizedMessages.computeIfAbsent(locale, ignored ->
                         chatFormatter.formatPreparedMessage(player, finalChannel,
                                 mentionManager.render(player, mentions, recipient).component(), recipient));
-                recipient.sendMessage(localizedMessage);
-                if (mentionResult.mentionedPlayers().contains(recipient.getUniqueId())) {
+                recipient.sendMessage(gg.fotia.chat.api.PlayerPreferences.display(recipient, localizedMessage));
+                if (mentionResult.mentionedPlayers().contains(recipient.getUniqueId())
+                        && gg.fotia.chat.api.PlayerPreferences.allows(recipient, "fotiachat", "chat.mention", player.getUniqueId())) {
                     mentionManager.notify(recipient);
                 }
             }

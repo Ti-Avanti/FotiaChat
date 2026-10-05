@@ -9,6 +9,7 @@ import gg.fotia.chat.itemdisplay.ItemDisplayManager;
 import gg.fotia.chat.util.LegacyColorConverter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -149,6 +150,13 @@ public class ChatFormatter {
     }
 
     private Component formatInternal(SenderContext sender, Channel channel, String formatTemplate, Component messageComponent) {
+        if (gg.fotia.basictool.bridge.PaperNickBridge.active("FotiaChat", sender.uniqueId())) {
+            String anonymous = gg.fotia.basictool.bridge.PaperNickBridge.chatFormat("FotiaChat", sender.uniqueId(), formatTemplate)
+                    .replace("{channel}", channel.getName()).replace("{message}", "<nick_message>");
+            return miniMessage.deserialize("<!i>" + LegacyColorConverter.convertToMiniMessage(anonymous),
+                    net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component("nick_message",
+                            messageComponent == null ? Component.empty() : messageComponent));
+        }
         Component processedMessage = messageComponent == null ? Component.empty() : messageComponent;
 
         if (channel.hasSegmentConfigs()) {
@@ -232,7 +240,7 @@ public class ChatFormatter {
 
         if (config != null && config.hasClick()) {
             String clickValue = resolvePlainText(config.getClickValue(), sender, channel, messagePlainText);
-            segmentComponent = segmentComponent.clickEvent(ClickEvent.clickEvent(config.getClickAction(), clickValue));
+            segmentComponent = segmentComponent.clickEvent(ClickEvents.create(config.getClickAction(), clickValue));
         }
 
         return segmentComponent;
@@ -316,7 +324,7 @@ public class ChatFormatter {
 
         if (channel.isClickEnabled() && !channel.getClickValue().isEmpty()) {
             String clickValue = resolvePlainText(channel.getClickValue(), sender, channel, "");
-            ClickEvent clickEvent = ClickEvent.clickEvent(channel.getClickAction(), clickValue);
+            ClickEvent clickEvent = ClickEvents.create(channel.getClickAction(), clickValue);
             prefixComponent = prefixComponent.clickEvent(clickEvent);
         }
 
@@ -486,7 +494,7 @@ public class ChatFormatter {
             return new SenderContext(
                     player,
                     player.getUniqueId(),
-                    player.getName(),
+                    gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player),
                     // 使用真实显示名（昵称插件设置的 displayName），而不是原始用户名
                     PlainTextComponentSerializer.plainText().serialize(player.displayName()),
                     player.getLocation(),

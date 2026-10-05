@@ -94,6 +94,7 @@ public class ColorManager {
      */
     public ChatColor getPlayerColor(Player player) {
         String colorId = playerColors.getOrDefault(player.getUniqueId(), defaultColorId);
+        colorId = gg.fotia.chat.api.PlayerPreferences.value(player, "chat.color", colorId);
         ChatColor color = colors.get(colorId);
         if (color == null || !color.hasPermission(player)) {
             return colors.get(defaultColorId);
@@ -117,6 +118,7 @@ public class ColorManager {
             plugin.getDatabaseManager().updatePlayerColor(player.getUniqueId(), player.getName(), colorId);
         }
         playerColors.put(player.getUniqueId(), colorId);
+        gg.fotia.chat.api.PlayerPreferences.save(player, "chat.color", colorId);
 
         return true;
     }
@@ -131,6 +133,7 @@ public class ColorManager {
         }
         // 保留本次会话的显式重置，迟到的登录读取不能覆盖它。
         playerColors.put(player.getUniqueId(), "");
+        gg.fotia.chat.api.PlayerPreferences.save(player, "chat.color", "");
     }
 
     /**

@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>Storage is busy. Please try again shortly.</red>"
   load-failed: "<!i><red>Your chat settings could not be loaded. Please reconnect later.</red>"
+
+preferences:
+  save-failed: <!i><red>Your preference could not be saved. Please try again later.

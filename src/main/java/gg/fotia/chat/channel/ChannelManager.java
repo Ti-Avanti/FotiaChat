@@ -2,6 +2,7 @@ package gg.fotia.chat.channel;
 
 import gg.fotia.chat.FotiaChat;
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -110,7 +111,7 @@ public class ChannelManager {
         }
 
         boolean clickEnabled = false;
-        ClickEvent.Action clickAction = ClickEvent.Action.SUGGEST_COMMAND;
+        ClickEvent.Action clickAction = ClickEvents.action("SUGGEST_COMMAND");
         String clickValue = "";
         ConfigurationSection clickSection = section.getConfigurationSection("click");
         if (clickSection != null) {
@@ -130,10 +131,10 @@ public class ChannelManager {
     private ClickEvent.Action parseClickAction(String action) {
         String safeAction = action == null ? "SUGGEST_COMMAND" : action.toUpperCase();
         return switch (safeAction) {
-            case "RUN_COMMAND" -> ClickEvent.Action.RUN_COMMAND;
-            case "OPEN_URL" -> ClickEvent.Action.OPEN_URL;
-            case "COPY_TO_CLIPBOARD" -> ClickEvent.Action.COPY_TO_CLIPBOARD;
-            default -> ClickEvent.Action.SUGGEST_COMMAND;
+            case "RUN_COMMAND" -> ClickEvents.action("RUN_COMMAND");
+            case "OPEN_URL" -> ClickEvents.action("OPEN_URL");
+            case "COPY_TO_CLIPBOARD" -> ClickEvents.action("COPY_TO_CLIPBOARD");
+            default -> ClickEvents.action("SUGGEST_COMMAND");
         };
     }
 
@@ -233,6 +234,7 @@ public class ChannelManager {
 
     public Channel getPlayerChannel(Player player) {
         String channelId = playerChannels.get(player.getUniqueId());
+        channelId = gg.fotia.chat.api.PlayerPreferences.value(player, "chat.channel", channelId == null ? "" : channelId);
         if (channelId == null) {
             return getDefaultChannel();
         }
@@ -245,6 +247,7 @@ public class ChannelManager {
             plugin.getDatabaseManager().updatePlayerChannel(player.getUniqueId(), player.getName(), channelId.toLowerCase());
         }
         playerChannels.put(player.getUniqueId(), channelId.toLowerCase());
+        gg.fotia.chat.api.PlayerPreferences.save(player, "chat.channel", channelId.toLowerCase());
     }
 
     public void loadPlayerChannel(Player player, String channelId) {
@@ -282,7 +285,7 @@ public class ChannelManager {
         private boolean hoverEnabled = false;
         private List<String> hoverText = new ArrayList<>();
         private boolean clickEnabled = false;
-        private ClickEvent.Action clickAction = ClickEvent.Action.SUGGEST_COMMAND;
+        private ClickEvent.Action clickAction = ClickEvents.action("SUGGEST_COMMAND");
         private String clickValue = "";
     }
 }

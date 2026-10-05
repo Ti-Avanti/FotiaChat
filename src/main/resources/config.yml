@@ -6,8 +6,7 @@ localization:
   # 玩家客户端语言不受支持、控制台消息或日志使用的默认语言
   # 可选: zh_CN, zh_TW, ja_JP, ko_KR, en_US, fr_FR, de_DE, it_IT, pt_PT, es_ES
   default-locale: zh_CN
-  # 根据玩家客户端语言分别显示消息和GUI文字
-  use-client-locale: true
+  # 安装 FotiaTranslator 后由其统一决定玩家语言；未安装时使用上面的默认语言。
   # 缺少翻译键时在控制台输出一次警告
   warn-missing-translation: true
 

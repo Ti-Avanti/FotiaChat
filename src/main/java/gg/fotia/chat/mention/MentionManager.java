@@ -58,12 +58,12 @@ public class MentionManager {
 
         Map<String, Player> playersByName = new LinkedHashMap<>();
         for (Player player : onlinePlayers) {
-            playersByName.putIfAbsent(player.getName().toLowerCase(Locale.ROOT), player);
+            playersByName.putIfAbsent(gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player).toLowerCase(Locale.ROOT), player);
         }
 
         List<MentionMatcher.Match> matches = MentionMatcher.findMatches(
                 plainText.serialize(safeMessage),
-                playersByName.values().stream().map(Player::getName).toList(),
+                playersByName.values().stream().map(p -> gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", p)).toList(),
                 config.isMentionAutoDetectPlayerName()
         );
         if (config.isDebugMode()) {
@@ -87,7 +87,7 @@ public class MentionManager {
 
     public void notify(Player player) {
         ConfigManager config = plugin.getConfigManager();
-        if (player == null || !config.isMentionSoundEnabled()) {
+        if (player == null || !config.isMentionSoundEnabled() || !gg.fotia.chat.api.PlayerPreferences.sound(player)) {
             return;
         }
 
@@ -136,7 +136,7 @@ public class MentionManager {
     private Component parseConfiguredText(String text, Player sender, String playerName) {
         String resolved = (text == null ? "" : text)
                 .replace("{player}", playerName)
-                .replace("{sender}", sender.getName());
+                .replace("{sender}", gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", sender));
         try {
             return miniMessage.deserialize(LegacyColorConverter.convertToMiniMessage(resolved));
         } catch (RuntimeException exception) {

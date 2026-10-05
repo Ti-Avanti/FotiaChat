@@ -6,6 +6,9 @@ author: Fotia
 description: 高级聊天管理插件
 
 softdepend:
+  - BasicTool
+  - FotiaTranslator
+  - BetterHud
   - PlaceholderAPI
   - CraftEngine
   - CustomNameplates
@@ -129,7 +132,7 @@ permissions:
     description: 允许使用公告命令
     default: op
   fotiachat.premium.shout:
-    description: 允许使用BossBar喊话
+    description: 允许使用 BetterHud 喊话
     default: op
   fotiachat.premium.shout.bypass:
     description: 绕过喊话冷却

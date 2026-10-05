@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>存储繁忙，请稍后重试。</red>"
   load-failed: "<!i><red>暂时无法读取你的聊天设置，请稍后重新连接。</red>"
+
+preferences:
+  save-failed: <!i><red>个人设置保存失败，请稍后重试。

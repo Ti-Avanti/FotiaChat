@@ -2,6 +2,7 @@ package gg.fotia.chat.crossserver;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -22,8 +23,7 @@ public final class CrossServerChatCodec {
 
     private static Component removeLocalSnapshotLinks(Component component) {
         ClickEvent click = component.clickEvent();
-        if (click != null && click.action() == ClickEvent.Action.RUN_COMMAND
-                && click.value().startsWith("/fotiachat viewsnapshot ")) {
+        if (ClickEvents.isCommandStartingWith(click, "/fotiachat viewsnapshot ")) {
             component = component.clickEvent(null).hoverEvent(null);
         }
         // 保持跨服物品文字预览，不携带大块物品 NBT，避免超出代理消息大小限制。

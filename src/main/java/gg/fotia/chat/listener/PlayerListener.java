@@ -50,6 +50,9 @@ public class PlayerListener implements Listener {
                     DatabaseManager.PlayerData data = result.data();
                     plugin.getChannelManager().loadPlayerChannel(player, data.channelId());
                     plugin.getColorManager().loadPlayerColor(player, data.colorId());
+                    gg.fotia.basictool.bridge.PaperPreferencesBridge.importValues(uuid, "fotiachat", java.util.Map.of(
+                            "chat.channel", data.channelId() == null ? "" : data.channelId(),
+                            "chat.color", data.colorId() == null ? "" : data.colorId()));
                 });
             });
             if (!accepted) plugin.getMessageManager().send(player, "storage.busy");

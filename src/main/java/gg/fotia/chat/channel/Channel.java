@@ -1,6 +1,7 @@
 package gg.fotia.chat.channel;
 
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -49,7 +50,7 @@ public class Channel {
         this.hoverEnabled = hoverEnabled;
         this.hoverText = hoverText == null ? List.of() : List.copyOf(hoverText);
         this.clickEnabled = clickEnabled;
-        this.clickAction = clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction;
+        this.clickAction = clickAction == null ? ClickEvents.action("SUGGEST_COMMAND") : clickAction;
         this.clickValue = clickValue == null ? "" : clickValue;
         this.segmentConfigs = normalizeSegmentConfigs(segmentConfigs);
     }
@@ -57,7 +58,7 @@ public class Channel {
     public Channel(String id, String name, ChannelType type, String format,
                    String permission, String shortcut, int radius, boolean isDefault) {
         this(id, name, type, format, permission, shortcut, radius, isDefault,
-                true, false, List.of(), false, ClickEvent.Action.SUGGEST_COMMAND, "", Map.of());
+                true, false, List.of(), false, ClickEvents.action("SUGGEST_COMMAND"), "", Map.of());
     }
 
     public String getId() {

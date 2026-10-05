@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>保存処理が混み合っています。しばらくしてから再試行してください。</red>"
   load-failed: "<!i><red>チャット設定を読み込めませんでした。後ほど再接続してください。</red>"
+
+preferences:
+  save-failed: <!i><red>Your preference could not be saved. Please try again later.

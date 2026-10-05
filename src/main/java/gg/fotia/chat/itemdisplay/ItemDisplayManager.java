@@ -379,7 +379,7 @@ public class ItemDisplayManager {
         // 娣诲姞鎮诞鏂囨湰
         List<String> hoverLines = localizedList(player, inventoryHoverKeys, inventoryHover);
         if (!hoverLines.isEmpty()) {
-            Component hoverText = buildSnapshotHover(player.getName(), itemCount, hoverLines);
+            Component hoverText = buildSnapshotHover(gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player), itemCount, hoverLines);
             component = component.hoverEvent(HoverEvent.showText(hoverText));
         }
 
@@ -407,7 +407,7 @@ public class ItemDisplayManager {
         // 娣诲姞鎮诞鏂囨湰
         List<String> hoverLines = localizedList(player, enderchestHoverKeys, enderchestHover);
         if (!hoverLines.isEmpty()) {
-            Component hoverText = buildSnapshotHover(player.getName(), itemCount, hoverLines);
+            Component hoverText = buildSnapshotHover(gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player), itemCount, hoverLines);
             component = component.hoverEvent(HoverEvent.showText(hoverText));
         }
 
@@ -666,7 +666,7 @@ public class ItemDisplayManager {
         ItemSnapshot snapshot = new ItemSnapshot(
                 id,
                 player.getUniqueId(),
-                player.getName(),
+                gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player),
                 ItemSnapshot.Type.HAND_ITEM,
                 contents,
                 System.currentTimeMillis() + snapshotExpireTime * 1000L
@@ -688,7 +688,7 @@ public class ItemDisplayManager {
         ItemSnapshot snapshot = new ItemSnapshot(
                 id,
                 player.getUniqueId(),
-                player.getName(),
+                gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player),
                 ItemSnapshot.Type.INVENTORY,
                 contents,
                 System.currentTimeMillis() + snapshotExpireTime * 1000L
@@ -713,7 +713,7 @@ public class ItemDisplayManager {
         ItemSnapshot snapshot = new ItemSnapshot(
                 id,
                 player.getUniqueId(),
-                player.getName(),
+                gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player),
                 ItemSnapshot.Type.ENDERCHEST,
                 contents,
                 System.currentTimeMillis() + snapshotExpireTime * 1000L

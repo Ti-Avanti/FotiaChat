@@ -9,6 +9,7 @@ import gg.fotia.chat.condition.ConditionSet;
 import gg.fotia.chat.util.MessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -140,7 +141,7 @@ public class AnnouncementManager {
 
         // 加载Click配置
         boolean clickEnabled = false;
-        ClickEvent.Action clickAction = ClickEvent.Action.SUGGEST_COMMAND;
+        ClickEvent.Action clickAction = ClickEvents.action("SUGGEST_COMMAND");
         String clickValue = "";
         ConfigurationSection clickSection = section.getConfigurationSection("click");
         if (clickSection != null) {
@@ -161,10 +162,10 @@ public class AnnouncementManager {
      */
     private ClickEvent.Action parseClickAction(String action) {
         return switch (action.toUpperCase()) {
-            case "RUN_COMMAND" -> ClickEvent.Action.RUN_COMMAND;
-            case "OPEN_URL" -> ClickEvent.Action.OPEN_URL;
-            case "COPY_TO_CLIPBOARD" -> ClickEvent.Action.COPY_TO_CLIPBOARD;
-            default -> ClickEvent.Action.SUGGEST_COMMAND;
+            case "RUN_COMMAND" -> ClickEvents.action("RUN_COMMAND");
+            case "OPEN_URL" -> ClickEvents.action("OPEN_URL");
+            case "COPY_TO_CLIPBOARD" -> ClickEvents.action("COPY_TO_CLIPBOARD");
+            default -> ClickEvents.action("SUGGEST_COMMAND");
         };
     }
 
@@ -252,7 +253,7 @@ public class AnnouncementManager {
             for (String line : lines) {
                 player.sendMessage(buildAnnouncementComponent(announcement, line, linesAreKeys, player));
             }
-            if (sound != null) {
+            if (sound != null && gg.fotia.chat.api.PlayerPreferences.sound(player)) {
                 player.playSound(player.getLocation(), sound,
                         announcement.getSoundVolume(), announcement.getSoundPitch());
             }
@@ -262,6 +263,7 @@ public class AnnouncementManager {
     private List<Player> eligiblePlayers(Announcement announcement) {
         List<Player> recipients = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!gg.fotia.chat.api.PlayerPreferences.allows(player, "fotiachat", "announcement.regular", null)) continue;
             if (announcement.hasPermission() && !player.hasPermission(announcement.getPermission())) {
                 continue;
             }
@@ -326,7 +328,7 @@ public class AnnouncementManager {
             String clickValue = plugin.getChatFormatter().getPlaceholderHandler()
                     .setPlaceholders(player, announcement.getClickValue());
 
-            ClickEvent clickEvent = ClickEvent.clickEvent(announcement.getClickAction(), clickValue);
+            ClickEvent clickEvent = ClickEvents.create(announcement.getClickAction(), clickValue);
             component = component.clickEvent(clickEvent);
         }
 

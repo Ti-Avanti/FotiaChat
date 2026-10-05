@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>저장 작업이 혼잡합니다. 잠시 후 다시 시도해 주세요.</red>"
   load-failed: "<!i><red>채팅 설정을 불러오지 못했습니다. 나중에 다시 접속해 주세요.</red>"
+
+preferences:
+  save-failed: <!i><red>Your preference could not be saved. Please try again later.

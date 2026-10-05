@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>Il sistema di archiviazione è occupato. Riprova tra poco.</red>"
   load-failed: "<!i><red>Impossibile caricare le tue impostazioni della chat. Riconnettiti più tardi.</red>"
+
+preferences:
+  save-failed: <!i><red>Your preference could not be saved. Please try again later.

@@ -43,7 +43,7 @@ public final class LocalizationService {
     }
 
     public String locale(Player player) {
-        return localeResolver.resolve(player == null ? null : player.getLocale());
+        return gg.fotia.basictool.bridge.PaperPreferencesBridge.locale(player, gg.fotia.translator.bridge.PaperTranslatorBridge.locale(player, defaultLocale()));
     }
 
     public String defaultLocale() {
@@ -59,6 +59,9 @@ public final class LocalizationService {
     }
 
     public String translate(String locale, String key) {
+        var translated = gg.fotia.translator.bridge.PaperTranslatorBridge.find("fotiachat", locale, key);
+        if (translated.isPresent() && !(translated.get() instanceof java.util.List<?>)) return String.valueOf(translated.get());
+
         String result = catalog.translate(locale, key);
         if (warnMissingTranslations && result.equals(key) && warnedMissingKeys.add(key)) {
             plugin.getLogger().warning("缺少翻译键: " + key);

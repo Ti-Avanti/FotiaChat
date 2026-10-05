@@ -2,6 +2,7 @@ package gg.fotia.chat.announcement;
 
 import gg.fotia.chat.condition.ConditionSet;
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class Announcement {
     public Announcement(String id, String permission, int interval, List<String> messages,
                         boolean enabled, String sound, float soundVolume, float soundPitch) {
         this(id, permission, interval, messages, enabled, sound, soundVolume, soundPitch,
-                false, List.of(), false, ClickEvent.Action.SUGGEST_COMMAND, "");
+                false, List.of(), false, ClickEvents.action("SUGGEST_COMMAND"), "");
     }
 
     public String getId() {

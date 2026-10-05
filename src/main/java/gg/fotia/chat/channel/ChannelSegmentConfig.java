@@ -1,6 +1,7 @@
 package gg.fotia.chat.channel;
 
 import net.kyori.adventure.text.event.ClickEvent;
+import gg.fotia.chat.util.ClickEvents;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -26,7 +27,7 @@ public class ChannelSegmentConfig {
         this.hoverEnabled = hoverEnabled;
         this.hoverText = List.copyOf(hoverText == null ? List.of() : hoverText);
         this.clickEnabled = clickEnabled;
-        this.clickAction = clickAction == null ? ClickEvent.Action.SUGGEST_COMMAND : clickAction;
+        this.clickAction = clickAction == null ? ClickEvents.action("SUGGEST_COMMAND") : clickAction;
         this.clickValue = clickValue == null ? "" : clickValue;
     }
 

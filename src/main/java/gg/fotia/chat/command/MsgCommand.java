@@ -63,7 +63,7 @@ public class MsgCommand implements CommandExecutor, TabCompleter {
 
         String input = args[0].toLowerCase();
         LinkedHashSet<String> suggestions = new LinkedHashSet<>(Bukkit.getOnlinePlayers().stream()
-                .map(Player::getName)
+                .map(p -> gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", p))
                 .filter(name -> name.toLowerCase().startsWith(input))
                 .collect(Collectors.toList()));
         suggestions.addAll(privateMessageManager.suggestVirtualTargetNames(args[0]));

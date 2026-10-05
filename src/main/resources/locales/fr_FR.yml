@@ -310,3 +310,6 @@ configured-announcements:
 storage:
   busy: "<!i><red>Le stockage est occupé. Réessaie dans un instant.</red>"
   load-failed: "<!i><red>Tes paramètres de discussion sont indisponibles. Reconnecte-toi plus tard.</red>"
+
+preferences:
+  save-failed: <!i><red>Your preference could not be saved. Please try again later.

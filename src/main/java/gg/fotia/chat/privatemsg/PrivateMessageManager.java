@@ -37,7 +37,7 @@ public class PrivateMessageManager {
             return false;
         }
 
-        Player target = Bukkit.getPlayer(targetName);
+        Player target = gg.fotia.basictool.bridge.PaperNickBridge.findPlayer("FotiaChat", targetName);
         if (target != null && target.isOnline()) {
             return sendMessage(sender, target, message);
         }
@@ -92,14 +92,18 @@ public class PrivateMessageManager {
         }
 
         // 对方屏蔽了发送者时拦截私聊，与公屏聊天的屏蔽行为保持一致
+        if (!gg.fotia.chat.api.PlayerPreferences.allows(target, "fotiachat", "chat.private", sender.getUniqueId())) {
+            plugin.getMessageManager().send(sender, "privatemsg.target-ignoring");
+            return false;
+        }
         if (plugin.getIgnoreManager() != null
                 && plugin.getIgnoreManager().isIgnoring(target.getUniqueId(), sender.getUniqueId())) {
             plugin.getMessageManager().send(sender, "privatemsg.target-ignoring");
             return false;
         }
 
-        sendSenderEcho(sender, target.getName(), message);
-        sendReceiverEcho(target, sender.getName(), message);
+        sendSenderEcho(sender, gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", target), message);
+        sendReceiverEcho(target, gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", sender), message);
 
         lastMessageFrom.put(target.getUniqueId(), sender.getUniqueId());
         lastMessageFrom.put(sender.getUniqueId(), target.getUniqueId());
@@ -143,8 +147,9 @@ public class PrivateMessageManager {
         if (target == null || !target.isOnline()) {
             return false;
         }
+        if (!gg.fotia.chat.api.PlayerPreferences.allows(target, "fotiachat", "chat.private", senderUuid)) return false;
 
-        sendReceiverEcho(target, senderName, message);
+        sendReceiverEcho(target, gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", senderUuid, senderName), message);
         if (senderUuid != null) {
             lastMessageFrom.put(target.getUniqueId(), senderUuid);
         }
@@ -261,7 +266,7 @@ public class PrivateMessageManager {
             return null;
         }
 
-        Player playerTarget = Bukkit.getPlayer(name);
+        Player playerTarget = gg.fotia.basictool.bridge.PaperNickBridge.findPlayer("FotiaChat", name);
         if (playerTarget != null && playerTarget.isOnline()) {
             return new ResolvedPrivateTarget(playerTarget);
         }
@@ -285,6 +290,7 @@ public class PrivateMessageManager {
     }
 
     private void sendSenderEcho(Player sender, String targetName, String message) {
+        if (!gg.fotia.chat.api.PlayerPreferences.allows(sender, "fotiachat", "chat.private", sender.getUniqueId())) return;
         sender.sendMessage(plugin.getMessageManager().get("privatemsg.format-sender", sender, Map.of(
                 "target", targetName,
                 "message", message

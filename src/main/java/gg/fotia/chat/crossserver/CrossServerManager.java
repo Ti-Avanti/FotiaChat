@@ -143,11 +143,12 @@ public class CrossServerManager {
         UUID senderUuid = message.getSenderUuid();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if ((permission == null || permission.isEmpty() || player.hasPermission(permission))
+                    && gg.fotia.chat.api.PlayerPreferences.allows(player, "fotiachat", "chat.public", senderUuid)
                     && (senderUuid == null || !plugin.getIgnoreManager().isIgnoring(player.getUniqueId(), senderUuid))) {
                 if (message.getSenderName() == null || message.getSenderName().isEmpty()) {
-                    player.sendMessage(CrossServerChatCodec.decode(message.getMessage()));
+                    player.sendMessage(gg.fotia.chat.api.PlayerPreferences.display(player, CrossServerChatCodec.decode(message.getMessage())));
                 } else {
-                    player.sendMessage(buildLocalizedChatMessage(player, channel, message));
+                    player.sendMessage(gg.fotia.chat.api.PlayerPreferences.display(player, buildLocalizedChatMessage(player, channel, message)));
                 }
             }
         }
@@ -193,6 +194,7 @@ public class CrossServerManager {
                 "message", msg
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!gg.fotia.chat.api.PlayerPreferences.allows(player, "fotiachat", "announcement.regular", null)) continue;
             player.sendMessage(plugin.getMessageManager().get(
                     "crossserver.broadcast-format", player, placeholders));
         }
@@ -242,7 +244,7 @@ public class CrossServerManager {
                 CrossServerMessage.TYPE_CHAT,
                 serverName,
                 player.getUniqueId(),
-                player.getName(),
+                gg.fotia.basictool.bridge.PaperNickBridge.name("FotiaChat", player),
                 channel.getId(),
                 safeMessage
         ));
