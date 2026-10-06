@@ -7,6 +7,7 @@ import gg.fotia.chat.channel.ChannelSegmentConfig;
 import gg.fotia.chat.color.ChatColor;
 import gg.fotia.chat.itemdisplay.ItemDisplayManager;
 import gg.fotia.chat.util.LegacyColorConverter;
+import gg.fotia.chat.util.ComponentTextTransformer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import gg.fotia.chat.util.ClickEvents;
@@ -203,10 +204,7 @@ public class ChatFormatter {
     }
 
     private Component replaceSegmentMarker(Component source, Pattern markerPattern, Component replacement) {
-        return source.replaceText(
-                markerPattern,
-                builder -> builder.content("").append(replacement).build()
-        );
+        return ComponentTextTransformer.replacePattern(source, markerPattern, replacement);
     }
 
     private String markSegmentTokens(String formatTemplate) {

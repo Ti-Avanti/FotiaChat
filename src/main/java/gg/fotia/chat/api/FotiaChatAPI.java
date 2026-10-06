@@ -24,7 +24,7 @@ import java.util.UUID;
  */
 public class FotiaChatAPI {
 
-    public static final String API_VERSION = "1.1.4";
+    public static final String API_VERSION = "1.1.5";
 
     private static FotiaChat plugin;
 

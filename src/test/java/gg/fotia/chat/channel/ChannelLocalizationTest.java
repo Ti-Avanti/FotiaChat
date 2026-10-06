@@ -15,13 +15,13 @@ class ChannelLocalizationTest {
         ChannelSegmentConfig segment = new ChannelSegmentConfig(
                 "channel", "lang:channels.global.display", true,
                 List.of("lang:channels.global.hover"), true,
-                ClickEvent.Action.SUGGEST_COMMAND, "/channel global"
+                ClickEvent.suggestCommand("").action(), "/channel global"
         );
         Channel channel = new Channel(
                 "global", "lang:channels.global.name", ChannelType.PUBLIC,
                 "lang:channels.global.format", "", "!", 0, true, true,
                 true, List.of("lang:channels.global.hover"), true,
-                ClickEvent.Action.SUGGEST_COMMAND, "/channel global",
+                ClickEvent.suggestCommand("").action(), "/channel global",
                 Map.of("channel", segment)
         );
 

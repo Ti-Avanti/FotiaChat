@@ -39,7 +39,7 @@ class AnnouncementConditionEvaluatorTest {
         ConditionSet conditions = engine.parse(config.getConfigurationSection("conditions"), "conditions");
         Announcement announcement = new Announcement(
                 "filtered", "", 300, List.of("message"), true, "", 1, 1,
-                false, List.of(), false, net.kyori.adventure.text.event.ClickEvent.Action.SUGGEST_COMMAND,
+                false, List.of(), false, net.kyori.adventure.text.event.ClickEvent.suggestCommand("").action(),
                 "", conditions);
         AnnouncementConditionEvaluator evaluator = new AnnouncementConditionEvaluator(engine);
 

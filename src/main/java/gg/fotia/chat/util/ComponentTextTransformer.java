@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 在保留 Adventure 样式树的前提下处理文本内容。
@@ -29,6 +30,12 @@ public final class ComponentTextTransformer {
             return source == null ? Component.empty() : source;
         }
         return source.replaceText(builder -> builder.matchLiteral(literal).replacement(replacement));
+    }
+
+    /** 替换格式标记，同时保留标记所在位置的样式及插入组件的交互内容。 */
+    public static Component replacePattern(Component source, Pattern pattern, ComponentLike replacement) {
+        return source.replaceText(config -> config.match(pattern)
+                .replacement((match, builder) -> builder.content("").append(replacement).build()));
     }
 
     public static boolean containsFont(Component component) {
