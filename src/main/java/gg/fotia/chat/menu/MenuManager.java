@@ -22,12 +22,18 @@ public class MenuManager {
 
     private final FotiaChat plugin;
     private final Map<String, Menu> menus = new HashMap<>();
+    private ColorMenuOptions colorOptions;
+    private ColorMenuBridge colorBridge;
+    private boolean bridgeUnavailable;
 
     public MenuManager(FotiaChat plugin) {
         this.plugin = plugin;
     }
 
     public void load() {
+        close();
+        colorOptions = null;
+        bridgeUnavailable = false;
         menus.clear();
         saveDefaultMenus();
 
@@ -56,6 +62,7 @@ public class MenuManager {
                     plugin.getLogger().fine("跳过非菜单配置: " + file.getName());
                     continue;
                 }
+                if (menuId.equals("color-menu")) colorOptions = ColorMenuOptions.read(config);
                 Menu menu = new Menu(menuId, config, plugin.getMessageManager());
                 menus.put(menuId, menu);
             }
@@ -91,8 +98,23 @@ public class MenuManager {
         if (menu == null) {
             return false;
         }
+        if (menuId.equals("color-menu") && colorOptions != null && colorOptions.futureUi()
+                && !bridgeUnavailable && plugin.getServer().getPluginManager().isPluginEnabled("FutureUI")) {
+            try {
+                if (colorBridge == null) colorBridge = new gg.fotia.chat.menu.futureui.FutureUiColorMenu(plugin, colorOptions);
+                ColorMenuBridge.OpenResult result = colorBridge.open(player);
+                if (result != ColorMenuBridge.OpenResult.UNAVAILABLE) return result == ColorMenuBridge.OpenResult.OPENED;
+            } catch (LinkageError incompatible) {
+                close(); bridgeUnavailable = true;
+                plugin.getLogger().warning("FutureUI 接口不可用，颜色菜单使用原界面: " + incompatible.getMessage());
+            }
+        }
         menu.open(player);
         return true;
+    }
+
+    public void close() {
+        if (colorBridge != null) { colorBridge.close(); colorBridge = null; }
     }
 
     /**

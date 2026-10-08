@@ -207,6 +207,9 @@ public class FotiaChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        runCleanup("关闭颜色菜单", () -> {
+            if (menuManager != null) menuManager.close();
+        });
         // 各清理步骤独立隔离：第三方 Addon 抛 Error 也不能阻断数据保存与连接关闭
         runCleanup("卸载Addon", () -> {
             if (addonManager != null) {
