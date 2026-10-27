@@ -6,6 +6,7 @@ author: Fotia
 description: 高级聊天管理插件
 
 softdepend:
+  - FotiaModel
   - FutureUI
   - BasicTool
   - FotiaTranslator

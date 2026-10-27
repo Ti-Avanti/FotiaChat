@@ -24,3 +24,22 @@ target/
 hs_err_pid*
 replay_pid*
 /.codegraph/
+
+# 本地构建产物、开发缓存与环境配置
+/.omx/
+/.codex/
+/.idea/
+/.vscode/
+/.gradle/
+/runtime/
+/runtime-*/
+/dist/
+**/build/
+**/node_modules/
+*.iml
+.env
+.env.*
+!.env.example
+!.env.template
+/nul
+/_nul
